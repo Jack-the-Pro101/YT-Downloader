@@ -1,0 +1,230 @@
+:root {
+  --font: "Inter", sans-serif, Arial, Helvetica;
+
+  --clr-primary-100: hsl(222, 75%, 5%);
+  --clr-primary-200: hsl(222, 70%, 10%);
+  --clr-primary-300: hsl(222, 85%, 25%);
+  --clr-primary-400: hsl(222, 100%, 35%);
+  --clr-primary-500: hsl(222, 100%, 57%);
+  --clr-primary-600: hsl(222, 100%, 65%);
+  --clr-primary-700: hsl(222, 100%, 75%);
+  --clr-primary-800: hsl(222, 100%, 85%);
+  --clr-primary-900: hsl(222, 100%, 95%);
+
+  --clr-comp: #745cf0;
+  --clr-comp2: #9b51df;
+  --clr-comp3: #d438a5;
+  --clr-accent: #ff896f;
+  --clr-accent2: #f9f871;
+  --clr-light: #e4efff;
+
+  --clr-neutral-100: hsl(244, 25%, 10%);
+  --clr-neutral-200: hsl(244, 10%, 20%);
+  --clr-neutral-300: hsl(244, 10%, 30%);
+  --clr-neutral-400: hsl(244, 10%, 40%);
+  --clr-neutral-500: hsl(244, 10%, 50%);
+  --clr-neutral-600: hsl(244, 10%, 60%);
+  --clr-neutral-700: hsl(244, 10%, 70%);
+  --clr-neutral-800: hsl(244, 10%, 80%);
+  --clr-neutral-900: hsl(244, 10%, 90%);
+
+  font-size: 8px;
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+* {
+  font-family: var(--font);
+}
+
+body {
+  font-size: 2rem;
+  color: var(--clr-neutral-900);
+  background-color: var(--clr-primary-200);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 1em 0;
+}
+
+.header__title {
+  font-size: 6rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.header__subtitle {
+  text-align: center;
+  font-size: 2.5rem;
+}
+
+.downloader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2em;
+  margin-top: 4em;
+}
+
+.downloader__form {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.downloader__fieldset {
+  border: none;
+  margin: 2em 0;
+}
+
+.downloader__heading {
+  margin-bottom: 0.5em;
+  font-size: 3rem;
+  font-weight: 600;
+}
+
+.url {
+  display: flex;
+  width: 100%;
+  border: 1px solid var(--clr-primary-500);
+  border-radius: 100vmax;
+}
+
+.url__input {
+  color: var(--clr-neutral-900);
+  background-color: transparent;
+  font-size: 2rem;
+  border: none;
+  flex-grow: 1;
+  padding: 1em;
+}
+
+.url__input:focus {
+  outline: none;
+}
+
+.url__download-btn {
+  font-size: 2.5rem;
+  line-height: 1;
+  font-weight: 500;
+  padding: 0.5em 1em;
+  color: var(--clr-neutral-900);
+  background-color: var(--clr-primary-500);
+  background-image: linear-gradient(45deg, var(--clr-primary-500), var(--clr-comp));
+  border-radius: 100vmax;
+  margin: -1px;
+  border: none;
+}
+
+.url__download-btn:hover {
+  cursor: pointer;
+}
+
+.options__option-list {
+  list-style-type: none;
+  margin-left: 2em;
+}
+
+.options__list {
+  list-style-type: none;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.82em;
+}
+
+.options__item {
+  display: flex;
+  align-items: center;
+  margin-right: 1em;
+  font-weight: 500;
+}
+
+.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.options__item:last-child {
+  margin-right: 0;
+}
+
+.options__heading {
+  margin-right: 1em;
+}
+
+.options__heading h3 {
+  font-weight: 500;
+  color: var(--clr-neutral-700);
+}
+
+.options__item input[type="radio"] {
+  width: 3rem;
+  height: 3rem;
+}
+
+.options__item label {
+  padding-left: 4px;
+  font-size: 2.5rem;
+}
+
+.container label {
+  padding-right: 0.5em;
+}
+
+.custom-quality {
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-quality__track {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5em;
+}
+
+.custom-quality__track label {
+  margin-right: 0.5em;
+}
+
+.custom-quality__view-source {
+  height: 100%;
+  padding: calc(0.2em + 2px) 0.5em;
+  border-radius: 0 100vmax 100vmax 0;
+  font-size: 2rem;
+  border: none;
+  color: var(--clr-neutral-900);
+  text-shadow: 0 0 8px var(--clr-neutral-100);
+  background-image: linear-gradient(45deg, var(--clr-accent), var(--clr-accent2));
+  cursor: pointer;
+}
+
+select {
+  font-size: 2rem;
+  background-color: var(--clr-primary-200);
+  color: var(--clr-neutral-900);
+  border: 1px solid var(--clr-primary-300);
+  text-shadow: 0 0 8px var(--clr-neutral-100);
+  padding: 0.2em 0.1em;
+  flex-grow: 1;
+}
+
+select:hover,
+select:focus {
+  outline: none;
+  background-color: var(--clr-primary-300);
+  border: 1px solid var(--clr-primary-600);
+}
+
+input[type="checkbox"] {
+  width: 3rem;
+  height: 3rem;
+}

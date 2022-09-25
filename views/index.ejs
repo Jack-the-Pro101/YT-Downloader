@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>YT Downloader</title>
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="./assets/css/style.css" />
+
+    <script>
+      const FORMATS = <%- JSON.stringify(locals.FORMATS) %>;
+      const QUALITIES = <%- JSON.stringify(locals.QUALITIES) %>;
+      const AUDIO_CONTAINERS = <%- JSON.stringify(locals.AUDIO_CONTAINERS) %>;
+      const VIDEO_CONTAINERS = <%- JSON.stringify(locals.VIDEO_CONTAINERS) %>;
+    </script>
+
+    <script src="./assets/js/app.js" defer></script>
+  </head>
+  <body>
+    <header class="header">
+      <h1 class="header__title">YouTube Downloader</h1>
+      <p class="header__subtitle">By Emperor of Bluegaria</p>
+    </header>
+    <main class="downloader">
+      <form action="#" class="downloader__form">
+        <fieldset class="downloader__fieldset url">
+          <input class="url__input" type="url" name="url" id="url" placeholder="Input video URL..." maxlength="1000" autocomplete="off" required />
+          <button class="url__download-btn">Download</button>
+        </fieldset>
+        <fieldset class="downloader__fieldset options">
+          <h2 class="downloader__heading">Options</h2>
+          <ul class="options__option-list">
+            <li class="options__options-item">
+              <ul class="options__list">
+                <li class="options__heading">
+                  <h3>Format</h3>
+                </li>
+                <li class="options__item">
+                  <input type="radio" name="format" id="audio" checked />
+                  <label for="audio">Audio</label>
+                </li>
+                <li class="options__item">
+                  <input type="radio" name="format" id="video" />
+                  <label for="video">Video</label>
+                </li>
+                <li class="options__item">
+                  <input type="radio" name="format" id="videoaudio" />
+                  <label for="videoaudio">Video & Audio</label>
+                </li>
+              </ul>
+            </li>
+            <li class="options__options-item quality">
+              <ul class="options__list">
+                <li class="options__heading">
+                  <h3>Quality</h3>
+                </li>
+                <li class="options__item">
+                  <input type="radio" name="quality" id="lowest" />
+                  <label for="lowest">Lowest</label>
+                </li>
+                <li class="options__item">
+                  <input type="radio" name="quality" id="highest" checked />
+                  <label for="highest">Highest</label>
+                </li>
+              </ul>
+            </li>
+            <li class="options__options-item container">
+              <ul class="options__list">
+                <li class="options__heading">
+                  <h3>Container</h3>
+                </li>
+                <li class="options__item">
+                  <label for="container">Type</label>
+                  <select name="container" id="container">
+                    <!-- Options are populated through JS -->
+                    <% locals.AUDIO_CONTAINERS.forEach(container => { %> <%- `
+                    <option value="${container}" class="container__option">${container}</option>
+                    ` %> <% }) %>
+                  </select>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </fieldset>
+        <fieldset class="downloader__fieldset custom-quality-enabler">
+          <label for="custom">Custom Quality</label>
+          <input type="checkbox" name="custom" id="custom" />
+        </fieldset>
+        <fieldset class="downloader__fieldset custom-quality disabled" disabled>
+          <div class="custom-quality__track">
+            <label for="customvideo">Video</label>
+            <select name="customvideo" id="customvideo" class="custom-quality__selector">
+              <!-- Options are populated after GET -->
+            </select>
+            <button class="custom-quality__view-source customvideo-btn">View Source</button>
+          </div>
+          <div class="custom-quality__track">
+            <label for="customaudio">Audio</label>
+            <select name="customaudio" id="customaudio" class="custom-quality__selector">
+              <!-- Options are populated after GET -->
+            </select>
+            <button class="custom-quality__view-source customaudio-btn">View Source</button>
+          </div>
+        </fieldset>
+        <fieldset class="downloader__fieldset post-processing">
+          <label for="postprocessing">Post-Processing</label>
+          <input type="checkbox" name="postprocessing" id="postprocessing" checked />
+
+          <p class="post-processing__explain">
+            MOST USERS: Leave this option <b>enabled</b>! <br />
+            This option determines whether or not the downloader should be allowed to use FFMPEG after downloading from YouTube. This allows
+            qualities/containers to be manipulated allowing for better and more customized downloads.
+          </p>
+        </fieldset>
+      </form>
+    </main>
+  </body>
+</html>

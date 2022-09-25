@@ -1,0 +1,44 @@
+{
+  "name": "yt-downloader",
+  "version": "1.0.0",
+  "description": "Stable universal YT downloader with web interface",
+  "main": "server.js",
+  "bin": "server.js",
+  "pkg": {
+    "assets": [
+      "views/**/*",
+      "public/**/*",
+      "routes/**/*",
+      "node_modules/ffmpeg-static/*"
+    ],
+    "scripts": "require.js",
+    "outputPath": "dist"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "dev": "nodemon . --ignore public",
+    "start": "node .",
+    "build": "pkg .",
+    "buildwin": "pkg . --target node18-win-x64"
+  },
+  "keywords": [
+    "yt",
+    "youtube",
+    "downloader"
+  ],
+  "author": "Emperor of Bluegaria (Jack H.)",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "ejs": "^3.1.8",
+    "express": "^4.18.1",
+    "express-ws": "^5.0.2",
+    "ffmpeg-static": "^5.1.0",
+    "open": "^8.4.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.2"
+  }
+}
