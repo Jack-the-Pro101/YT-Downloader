@@ -5,6 +5,8 @@ const ffmpegStatic = require("ffmpeg-static");
 const { spawn, spawnSync } = require("child_process");
 
 const path = require("path");
+const events = require("events");
+const emitter = new events.EventEmitter();
 
 const VideosCacheStore = require("./classes/VideosCacheStore");
 
@@ -55,7 +57,7 @@ exports.getInfo = async (url) => {
   }
 };
 
-exports.download = async (url, info) => {
+exports.download = (url, info) => {
   if (!validateURL(url)) return false;
 
   const args = [];
@@ -64,17 +66,33 @@ exports.download = async (url, info) => {
     switch (info.format) {
       case constants.FORMATS.AUDIO:
         if (info.postProcessing) {
-          args.push("--format", info.quality.value.audio, "--extract-audio", "--audio-format", info.container);
+          args.push(
+            "--format",
+            info.quality.value.audio,
+            "--extract-audio",
+            "--audio-format",
+            info.container
+          );
         }
         break;
       case constants.FORMATS.VIDEO:
         if (info.postProcessing) {
-          args.push("--format", info.quality.value.video, "--remux-video", info.container);
+          args.push(
+            "--format",
+            info.quality.value.video,
+            "--remux-video",
+            info.container
+          );
         }
         break;
       case constants.FORMATS.VIDEOAUDIO:
         if (info.postProcessing) {
-          args.push("--format", `${info.quality.value.audio}+${info.quality.value.video}`, "--merge-output-format", info.container);
+          args.push(
+            "--format",
+            `${info.quality.value.audio}+${info.quality.value.video}`,
+            "--merge-output-format",
+            info.container
+          );
         }
         break;
 
@@ -88,13 +106,24 @@ exports.download = async (url, info) => {
       case constants.FORMATS.AUDIO:
         if (info.quality.value === constants.QUALITIES.HIGHEST) {
           if (info.postProcessing) {
-            args.push("--format", "bestaudio", "--extract-audio", "--audio-format", info.container);
+            args.push(
+              "--format",
+              "bestaudio",
+              "--extract-audio",
+              "--audio-format",
+              info.container
+            );
           } else {
             args.push("--format", "bestaudio");
           }
         } else {
           if (info.postProcessing) {
-            args.push("--format", "worstaudio", "--audio-format", info.container);
+            args.push(
+              "--format",
+              "worstaudio",
+              "--audio-format",
+              info.container
+            );
           } else {
             args.push("--format", "worstaudio");
           }
@@ -110,7 +139,12 @@ exports.download = async (url, info) => {
           }
         } else {
           if (info.postProcessing) {
-            args.push("--format", "worstaudio", "--remux-video", info.container);
+            args.push(
+              "--format",
+              "worstaudio",
+              "--remux-video",
+              info.container
+            );
           } else {
             args.push("--format", "worstaudio");
           }
@@ -120,13 +154,23 @@ exports.download = async (url, info) => {
       case constants.FORMATS.VIDEOAUDIO:
         if (info.quality.value === constants.QUALITIES.HIGHEST) {
           if (info.postProcessing) {
-            args.push("--format", "bestvideo+bestaudio", "--merge-output-format", info.container);
+            args.push(
+              "--format",
+              "bestvideo+bestaudio",
+              "--merge-output-format",
+              info.container
+            );
           } else {
             args.push("--format", "bestvideo+bestaudio");
           }
         } else {
           if (info.postProcessing) {
-            args.push("--format", "worstvideo+worstaudio", "--merge-output-format", info.container);
+            args.push(
+              "--format",
+              "worstvideo+worstaudio",
+              "--merge-output-format",
+              info.container
+            );
           } else {
             args.push("--format", "worstvideo+worstaudio");
           }
@@ -140,10 +184,28 @@ exports.download = async (url, info) => {
   }
 
   const process = interact(url, args);
+
+  let previousLine = "";
+
   process.stdout.on("data", (data) => {
-    console.log(data.toString());
+    const text = data.toString();
+
+    if (text.trim() != null) previousLine = text;
+
+    const done = text.indexOf("Destination: ");
+    const progress = text.indexOf("[download]");
+
+    if (done && previousLine.startsWith("[download]")) {
+      emitter.emit("finish", text.slice(done, text.length));
+    } else if (progress) {
+      emitter.emit("progress", {
+        percentage: text.slice(progress, 7).trim(),
+      });
+    }
   });
   process.stderr.on("data", (data) => {
     console.log(data.toString());
   });
+
+  return emitter;
 };

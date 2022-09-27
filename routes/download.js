@@ -8,14 +8,19 @@ const { validateURL } = require("../utils");
 const { download } = require("../wrapper");
 
 router.post("/", (req, res) => {
-  if (!fs.existsSync(path.join(process.cwd(), "../tmp"))) fs.mkdirSync(path.join(process.cwd(), "../tmp"));
+  if (!fs.existsSync(path.join(process.cwd(), "./tmp")))
+    fs.mkdirSync(path.join(process.cwd(), "./tmp"));
 
   const url = req.query.url;
   const info = req.body;
 
   if (!validateURL(url)) return res.sendStatus(400);
 
-  download(url, info);
+  const downloader = download(url, info);
+
+  downloader.once("finish", (dest) => {
+    res.sendFile(dest);
+  });
 
   res.sendStatus(200);
 });
