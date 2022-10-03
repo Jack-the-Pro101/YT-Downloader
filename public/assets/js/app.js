@@ -29,7 +29,9 @@ url.addEventListener("input", () => {
   if (url.value !== state.url) {
     state.url = url.value;
     state.data = null;
-    downloadBtn.innerText = customQualityCheckbox.checked ? "Get Info" : "Download";
+    downloadBtn.innerText = customQualityCheckbox.checked
+      ? "Get Info"
+      : "Download";
     populateCustomQualities(state.data);
   }
 });
@@ -103,9 +105,17 @@ function populateCustomQualities(data) {
       const option = document.createElement("option");
 
       option.value = format.format_id;
-      option.innerText = `${format.resolution}p ${format.video_ext} ${format.vcodec} @ ${format.fps}fps | ${
-        Math.round(((Number.EPSILON + format.filesize || format.filesize_approx) / 1000000) * 100) / 100
-      }MB | ${Math.round(((Number.EPSILON + format.vbr) / 1000) * 100) / 100}kbps bitrate`;
+      option.innerText = `${format.resolution}p ${format.video_ext} ${
+        format.vcodec
+      } @ ${format.fps}fps | ${
+        Math.round(
+          ((Number.EPSILON + format.filesize || format.filesize_approx) /
+            1000000) *
+            100
+        ) / 100
+      }MB | ${
+        Math.round(((Number.EPSILON + format.vbr) / 1000) * 100) / 100
+      }kbps bitrate`;
 
       option.dataset.source = format.url;
 
@@ -117,9 +127,17 @@ function populateCustomQualities(data) {
       const option = document.createElement("option");
 
       option.value = format.format_id;
-      option.innerText = `${format.asr}hz ${format.audio_ext} ${format.acodec} | ${
-        Math.round(((Number.EPSILON + format.filesize || format.filesize_approx) / 1000000) * 100) / 100
-      }MB | ${Math.round(((Number.EPSILON + format.abr) / 1000) * 100) / 100}kbps bitrate`;
+      option.innerText = `${format.asr}hz ${format.audio_ext} ${
+        format.acodec
+      } | ${
+        Math.round(
+          ((Number.EPSILON + format.filesize || format.filesize_approx) /
+            1000000) *
+            100
+        ) / 100
+      }MB | ${
+        Math.round(((Number.EPSILON + format.abr) / 1000) * 100) / 100
+      }kbps bitrate`;
 
       option.dataset.source = format.url;
 
@@ -133,14 +151,16 @@ customVideoViewSrcBtn.addEventListener("click", (e) => {
   e.preventDefault();
   if (customVideoSelect.selectedIndex === -1) return;
 
-  const url = customVideoSelect.options[customVideoSelect.selectedIndex].dataset.source;
+  const url =
+    customVideoSelect.options[customVideoSelect.selectedIndex].dataset.source;
   if (url) window.open(url, "_blank");
 });
 customAudioViewSrcBtn.addEventListener("click", (e) => {
   e.preventDefault();
   if (customAudioSelect.selectedIndex === -1) return;
 
-  const url = customAudioSelect.options[customAudioSelect.selectedIndex].dataset.source;
+  const url =
+    customAudioSelect.options[customAudioSelect.selectedIndex].dataset.source;
   if (url) window.open(url, "_blank");
 });
 
@@ -197,11 +217,21 @@ form.addEventListener("submit", async (e) => {
     container,
   };
 
-  const download = fetch("download?url=" + url.value, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
+  const urlParams = new URLSearchParams();
+  urlParams.append("url", state.url);
+  urlParams.append("info", JSON.stringify(payload));
+
+  const download = await fetch("download?" + urlParams.toString(), {
+    method: "GET",
   });
+
+  const blob = await download.blob();
+
+  const downloadURL = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = downloadURL;
+  a.download = download.headers.get("Filename");
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
 });

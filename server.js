@@ -16,10 +16,8 @@ const ffmpegStatic = require("ffmpeg-static");
 (async function () {
   console.time("Start");
 
-  console.log(fs.readdirSync(path.join(__dirname, "/node_modules/ffmpeg-static/")));
-
-  const test = spawn(path.join(__dirname, "/node_modules/ffmpeg-static/ffmpeg.exe"), ["-version"]);
-  test.stdout.on("data", (data) => console.log(data.toString("utf8")));
+  // const test = spawn(path.join(__dirname, "/node_modules/ffmpeg-static/ffmpeg.exe"), ["-version"]);
+  // test.stdout.on("data", (data) => console.log(data.toString("utf8")));
 
   console.log(chalk.green("\nStarting YouTube downloader..."));
   console.log(chalk.green("Starting webpage UI..."));
@@ -48,7 +46,10 @@ const ffmpegStatic = require("ffmpeg-static");
 
   routerFiles.forEach(async function (file) {
     const fileBase = path.basename(file, path.extname(file));
-    const routerPath = path.join(__dirname, routesPath + fileBase + path.extname(file));
+    const routerPath = path.join(
+      __dirname,
+      routesPath + fileBase + path.extname(file)
+    );
     const router = require(routerPath);
 
     if (preconfiguredRoutes[fileBase] != null) {
@@ -80,7 +81,11 @@ const ffmpegStatic = require("ffmpeg-static");
       });
     });
   } else {
-    console.log(chalk.green("Development environment enabled, skipping version check for start up time..."));
+    console.log(
+      chalk.green(
+        "Development environment enabled, skipping version check for start up time..."
+      )
+    );
   }
 
   app.listen(710, (err) => {
