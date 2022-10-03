@@ -6,7 +6,6 @@ const { spawn, spawnSync } = require("child_process");
 
 const path = require("path");
 const events = require("events");
-const emitter = new events.EventEmitter();
 
 const VideosCacheStore = require("./classes/VideosCacheStore");
 
@@ -25,6 +24,7 @@ const interact = (url, args = []) => {
     path.join(process.cwd(), "/tmp/") + "%(title)s.%(ext)s",
     "--ffmpeg-location",
     ffmpegStatic,
+    "--restrict-filenames",
     url,
   ]);
   child.stdout.setEncoding("utf8");
@@ -60,39 +60,47 @@ exports.getInfo = async (url) => {
 exports.download = (url, info) => {
   if (!validateURL(url)) return false;
 
-  const args = [];
+  // ctx_id: "None";
+  // downloaded_bytes: 3064351;
+  // elapsed: 0.5761923789978027;
+  // eta: 0;
+  // filename: "H:\\Programming Projects\\Programming\\Other\\YT Downloader\\tmp\\TheFatRat - Time Lapse.webm";
+  // speed: 8420293.143194817;
+  // status: "downloading";
+  // tmpfilename: "H:\\Programming Projects\\Programming\\Other\\YT Downloader\\tmp\\TheFatRat - Time Lapse.webm.part";
+  // total_bytes: 3064351;
+  // _default_template: "100.0% of 2.92MiB at    8.03MiB/s ETA 00:00";
+  // _downloaded_bytes_str: "2.92MiB";
+  // _elapsed_str: "00:00";
+  // _eta_str: "00:00";
+  // _percent_str: "100.0%";
+  // _speed_str: "   8.03MiB/s";
+  // _total_bytes_estimate_str: "N/A";
+  // _total_bytes_str: "2.92MiB";
+
+  const args = [
+    "--exec",
+    "echo =%(filepath)s",
+    "--progress-template",
+    "-%(progress.status)s,%(progress._total_bytes_str)s,%(progress._percent_str)s,%(progress._speed_str)s,%(progress._eta_str)s",
+  ];
+  const emitter = new events.EventEmitter();
 
   if (info.quality.custom) {
     switch (info.format) {
       case constants.FORMATS.AUDIO:
         if (info.postProcessing) {
-          args.push(
-            "--format",
-            info.quality.value.audio,
-            "--extract-audio",
-            "--audio-format",
-            info.container
-          );
+          args.push("--format", info.quality.value.audio, "--extract-audio", "--audio-format", info.container);
         }
         break;
       case constants.FORMATS.VIDEO:
         if (info.postProcessing) {
-          args.push(
-            "--format",
-            info.quality.value.video,
-            "--remux-video",
-            info.container
-          );
+          args.push("--format", info.quality.value.video, "--remux-video", info.container);
         }
         break;
       case constants.FORMATS.VIDEOAUDIO:
         if (info.postProcessing) {
-          args.push(
-            "--format",
-            `${info.quality.value.audio}+${info.quality.value.video}`,
-            "--merge-output-format",
-            info.container
-          );
+          args.push("--format", `${info.quality.value.audio}+${info.quality.value.video}`, "--merge-output-format", info.container);
         }
         break;
 
@@ -106,24 +114,13 @@ exports.download = (url, info) => {
       case constants.FORMATS.AUDIO:
         if (info.quality.value === constants.QUALITIES.HIGHEST) {
           if (info.postProcessing) {
-            args.push(
-              "--format",
-              "bestaudio",
-              "--extract-audio",
-              "--audio-format",
-              info.container
-            );
+            args.push("--format", "bestaudio", "--extract-audio", "--audio-format", info.container);
           } else {
             args.push("--format", "bestaudio");
           }
         } else {
           if (info.postProcessing) {
-            args.push(
-              "--format",
-              "worstaudio",
-              "--audio-format",
-              info.container
-            );
+            args.push("--format", "worstaudio", "--audio-format", info.container);
           } else {
             args.push("--format", "worstaudio");
           }
@@ -139,12 +136,7 @@ exports.download = (url, info) => {
           }
         } else {
           if (info.postProcessing) {
-            args.push(
-              "--format",
-              "worstaudio",
-              "--remux-video",
-              info.container
-            );
+            args.push("--format", "worstaudio", "--remux-video", info.container);
           } else {
             args.push("--format", "worstaudio");
           }
@@ -154,23 +146,13 @@ exports.download = (url, info) => {
       case constants.FORMATS.VIDEOAUDIO:
         if (info.quality.value === constants.QUALITIES.HIGHEST) {
           if (info.postProcessing) {
-            args.push(
-              "--format",
-              "bestvideo+bestaudio",
-              "--merge-output-format",
-              info.container
-            );
+            args.push("--format", "bestvideo+bestaudio", "--merge-output-format", info.container);
           } else {
             args.push("--format", "bestvideo+bestaudio");
           }
         } else {
           if (info.postProcessing) {
-            args.push(
-              "--format",
-              "worstvideo+worstaudio",
-              "--merge-output-format",
-              info.container
-            );
+            args.push("--format", "worstvideo+worstaudio", "--merge-output-format", info.container);
           } else {
             args.push("--format", "worstvideo+worstaudio");
           }
@@ -185,22 +167,27 @@ exports.download = (url, info) => {
 
   const process = interact(url, args);
 
-  let previousLine = "";
-
   process.stdout.on("data", (data) => {
     const text = data.toString();
 
-    if (text.trim() != null) previousLine = text;
+    console.log(text);
 
-    const done = text.indexOf("Destination: ");
-    const progress = text.indexOf("[download]");
+    if (text.startsWith("-")) {
+      const info = text.split(/\,/g);
 
-    if (done && previousLine.startsWith("[download]")) {
-      emitter.emit("finish", text.slice(done, text.length));
-    } else if (progress) {
-      emitter.emit("progress", {
-        percentage: text.slice(progress, 7).trim(),
-      });
+      const status = info[0];
+      const totalSize = info[1];
+      const percent = info[2];
+      const speed = info[3];
+      const eta = info[4];
+
+      if (status === "downloading") {
+        emitter.emit("progress", {});
+      } else {
+        emitter.emit("downloaded");
+      }
+    } else if (text.startsWith("=")) {
+      emitter.emit("finish", path.basename(text.slice(1)));
     }
   });
   process.stderr.on("data", (data) => {

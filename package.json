@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Stable universal YT downloader with web interface",
   "main": "server.js",
-  "bin": "server.js",
+  "bin": "index.js",
   "pkg": {
     "assets": [
       "views/**/*",

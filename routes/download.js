@@ -8,8 +8,7 @@ const { validateURL } = require("../utils");
 const { download } = require("../wrapper");
 
 router.post("/", (req, res) => {
-  if (!fs.existsSync(path.join(process.cwd(), "./tmp")))
-    fs.mkdirSync(path.join(process.cwd(), "./tmp"));
+  if (!fs.existsSync(path.join(process.cwd(), "./tmp"))) fs.mkdirSync(path.join(process.cwd(), "./tmp"));
 
   const url = req.query.url;
   const info = req.body;
@@ -18,11 +17,11 @@ router.post("/", (req, res) => {
 
   const downloader = download(url, info);
 
-  downloader.once("finish", (dest) => {
-    res.sendFile(dest);
-  });
+  downloader.on("progress", (progress) => {});
 
-  res.sendStatus(200);
+  downloader.once("finish", (dest) => {
+    res.sendFile(dest, { root: path.join(process.cwd(), "/tmp") });
+  });
 });
 
 module.exports = router;

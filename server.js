@@ -26,6 +26,12 @@ const ffmpegStatic = require("ffmpeg-static");
 
   const app = express();
 
+  const expressWs = require("express-ws")(app);
+  global.websocket = expressWs;
+  expressWs.getWss().on("error", (err) => {
+    console.error(err);
+  });
+
   app.use(express.json());
   app.set("view engine", "ejs");
   app.use(express.urlencoded({ extended: false }));
