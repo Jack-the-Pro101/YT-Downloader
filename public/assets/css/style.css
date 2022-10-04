@@ -97,6 +97,12 @@ body {
   width: 100%;
   border: 1px solid var(--clr-primary-500);
   border-radius: 100vmax;
+  box-shadow: 0 0 12px -1px rgba(0, 0, 0, 0.75);
+  transition: box-shadow 0.2s ease;
+}
+
+.url:focus-within {
+  box-shadow: 0 0 12px -2px var(--clr-primary-600);
 }
 
 .url__input {
@@ -118,15 +124,21 @@ body {
   font-weight: 500;
   padding: 0.5em 1em;
   color: var(--clr-neutral-900);
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.65);
   background-color: var(--clr-primary-500);
-  background-image: linear-gradient(45deg, var(--clr-primary-500), var(--clr-comp));
+  background-image: linear-gradient(45deg, var(--clr-primary-500), var(--clr-comp3));
+  background-position: bottom left;
+  background-size: 200%;
+  background-repeat: no-repeat;
   border-radius: 100vmax;
   margin: -1px;
   border: none;
+  transition: background-position 0.5s ease-out;
 }
 
 .url__download-btn:hover {
   cursor: pointer;
+  background-position: top right;
 }
 
 .options__option-list {
@@ -151,6 +163,7 @@ body {
 .disabled {
   opacity: 0.35;
   cursor: not-allowed;
+  transition: opacity 0.15s ease;
 }
 
 .options__item:last-child {
@@ -180,6 +193,15 @@ body {
   padding-right: 0.5em;
 }
 
+.custom-quality-enabler {
+  display: flex;
+  align-items: center;
+}
+
+.custom-quality-enabler label {
+  color: var(--clr-neutral-700);
+}
+
 .custom-quality {
   display: flex;
   flex-direction: column;
@@ -204,7 +226,12 @@ body {
   color: var(--clr-neutral-900);
   text-shadow: 0 0 8px var(--clr-neutral-100);
   background-image: linear-gradient(45deg, var(--clr-accent), var(--clr-accent2));
+  background-color: var(--clr-accent);
   cursor: pointer;
+}
+
+input[type="checkbox"] {
+  margin-left: 0.75em;
 }
 
 select {
@@ -227,4 +254,165 @@ select:focus {
 input[type="checkbox"] {
   width: 3rem;
   height: 3rem;
+}
+
+.post-processing__selector {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1em;
+}
+
+.downloads {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  margin: 1em;
+  background-color: var(--clr-primary-200);
+  box-shadow: 0 0 12px -2px rgba(0, 0, 0, 0.75);
+  max-width: 350px;
+  width: 100%;
+  transition: background-color 0.25s ease;
+}
+
+.downloads:hover,
+.downloads:focus,
+.downloads:focus-within {
+  /* background-color: var(--clr-primary-300); */
+}
+
+.downloads__header {
+  padding: 1em;
+  color: var(--clr-neutral-900);
+  font-size: 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  font-weight: 600;
+  border-radius: 4px 4px 0px 0px;
+}
+
+.downloads__header:hover {
+  cursor: pointer;
+}
+
+.downloads__header .fa-chevron-down {
+  transition: transform 0.2s ease;
+}
+
+.collapsed .downloads__header .fa-chevron-down {
+  transform: rotate(180deg);
+}
+
+.collapsed .downloads__list-container {
+  display: none;
+}
+
+.downloads__list {
+  list-style-type: none;
+  max-height: 20em;
+  overflow-y: scroll;
+}
+
+.downloads__item {
+  padding: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  isolation: isolate;
+  background-color: var(--clr-primary-200);
+  min-height: 4em;
+}
+
+.downloads__name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.downloads__actions {
+  display: flex;
+  margin-left: 0.5em;
+  gap: 0.25em;
+}
+
+.downloading .downloads__actions {
+  display: none;
+}
+
+.downloads__action-btn {
+  background-color: inherit;
+  border: 1px solid var(--clr-primary-500);
+  border-radius: 50%;
+  font-size: 2rem;
+  padding: 0.25em 0.5em;
+  color: var(--clr-neutral-900);
+  width: 2em;
+  aspect-ratio: 1 / 1;
+}
+
+.downloads__action-btn:hover {
+  cursor: pointer;
+  background-color: var(--clr-primary-300);
+}
+
+.downloads__item:hover {
+  background-color: var(--clr-primary-200);
+}
+
+.downloads__progress-text {
+  margin-left: 0.5em;
+  font-size: 2rem;
+  display: none;
+}
+
+.downloading .downloads__progress-text {
+  display: block;
+}
+
+.progress__progress-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+}
+
+.downloads__progress-bar {
+  opacity: 0.3;
+  height: 100%;
+  width: 100%;
+  background-color: var(--clr-primary-600);
+  transition: transform 0.1s linear;
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+.footer {
+  padding: 2em;
+  background-color: var(--clr-primary-100);
+  min-height: 30vh;
+}
+
+.footer__credits {
+  text-align: center;
+  margin-bottom: 4em;
+}
+
+.footer__contacts {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  list-style-type: none;
+  display: flex;
+  justify-content: space-around;
+}
+
+@media screen AND (max-width: 750px) {
+  :root {
+    font-size: 4px;
+  }
 }
