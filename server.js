@@ -3,6 +3,8 @@ if (process.env.NODE_ENV !== "production") require("dotenv").config();
 const express = require("express");
 const ejs = require("ejs");
 const open = require("open");
+const cookieParser = require("cookie-parser");
+const { uuid } = require("uuidv4");
 
 const chalk = require("chalk");
 
@@ -31,9 +33,16 @@ const ffmpegStatic = require("ffmpeg-static");
   });
 
   app.use(express.json());
-  app.set("view engine", "ejs");
   app.use(express.urlencoded({ extended: false }));
+  app.set("view engine", "ejs");
+  app.use(cookieParser());
   app.use(express.static(path.join(__dirname, "./public")));
+
+  app.use((req, res) => {
+    if (req.cookies["clientID"] == null) {
+      res.cookie("clientID", uuid(), {});
+    }
+  });
 
   const routesPath = "/routes/";
   const directoryPath = path.join(__dirname, routesPath);

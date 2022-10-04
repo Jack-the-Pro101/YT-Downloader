@@ -31,6 +31,28 @@
   font-size: 8px;
 }
 
+.light-theme {
+  --clr-primary-900: hsl(222, 75%, 5%);
+  --clr-primary-800: hsl(222, 70%, 10%);
+  --clr-primary-700: hsl(222, 85%, 25%);
+  --clr-primary-600: hsl(222, 100%, 35%);
+  --clr-primary-500: hsl(222, 100%, 57%);
+  --clr-primary-400: hsl(222, 100%, 65%);
+  --clr-primary-300: hsl(222, 100%, 75%);
+  --clr-primary-200: hsl(222, 100%, 85%);
+  --clr-primary-100: hsl(222, 100%, 95%);
+
+  --clr-neutral-900: hsl(244, 25%, 10%);
+  --clr-neutral-800: hsl(244, 10%, 20%);
+  --clr-neutral-700: hsl(244, 10%, 30%);
+  --clr-neutral-600: hsl(244, 10%, 40%);
+  --clr-neutral-500: hsl(244, 10%, 50%);
+  --clr-neutral-400: hsl(244, 10%, 60%);
+  --clr-neutral-300: hsl(244, 10%, 70%);
+  --clr-neutral-200: hsl(244, 10%, 80%);
+  --clr-neutral-100: hsl(244, 10%, 90%);
+}
+
 *,
 *::before,
 *::after {
@@ -68,6 +90,10 @@ body {
   font-size: 2rem;
   color: var(--clr-neutral-900);
   background-color: var(--clr-primary-200);
+}
+
+.light-theme body {
+  background-color: var(--clr-neutral-100);
 }
 
 .header {
@@ -147,7 +173,11 @@ body {
   color: var(--clr-neutral-900);
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.65);
   background-color: var(--clr-primary-500);
-  background-image: linear-gradient(45deg, var(--clr-primary-500), var(--clr-comp3));
+  background-image: linear-gradient(
+    45deg,
+    var(--clr-primary-500),
+    var(--clr-comp3)
+  );
   background-position: bottom left;
   background-size: 200%;
   background-repeat: no-repeat;
@@ -246,7 +276,11 @@ body {
   border: none;
   color: var(--clr-neutral-900);
   text-shadow: 0 0 8px var(--clr-neutral-100);
-  background-image: linear-gradient(45deg, var(--clr-accent), var(--clr-accent2));
+  background-image: linear-gradient(
+    45deg,
+    var(--clr-accent),
+    var(--clr-accent2)
+  );
   background-color: var(--clr-accent);
   cursor: pointer;
 }

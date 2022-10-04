@@ -28,6 +28,7 @@
       const VIDEO_CONTAINERS = <%- JSON.stringify(locals.VIDEO_CONTAINERS) %>;
     </script>
 
+    <script src="./assets/libs/uuidv4/uuidv4.js"></script>
     <script src="./assets/js/app.js" defer></script>
   </head>
   <body>
@@ -97,7 +98,9 @@
                   <select name="container" id="container">
                     <!-- Options are populated through JS -->
                     <% locals.AUDIO_CONTAINERS.forEach(container => { %> <%- `
-                    <option value="${container}" class="container__option">${container}</option>
+                    <option value="${container}" class="container__option">
+                      ${container}
+                    </option>
                     ` %> <% }) %>
                   </select>
                 </li>
@@ -112,30 +115,48 @@
         <fieldset class="downloader__fieldset custom-quality disabled" disabled>
           <div class="custom-quality__track">
             <label for="customvideo">Video</label>
-            <select name="customvideo" id="customvideo" class="custom-quality__selector">
+            <select
+              name="customvideo"
+              id="customvideo"
+              class="custom-quality__selector"
+            >
               <!-- Options are populated after GET -->
             </select>
-            <button class="custom-quality__view-source customvideo-btn">View Source</button>
+            <button class="custom-quality__view-source customvideo-btn">
+              View Source
+            </button>
           </div>
           <div class="custom-quality__track">
             <label for="customaudio">Audio</label>
-            <select name="customaudio" id="customaudio" class="custom-quality__selector">
+            <select
+              name="customaudio"
+              id="customaudio"
+              class="custom-quality__selector"
+            >
               <!-- Options are populated after GET -->
             </select>
-            <button class="custom-quality__view-source customaudio-btn">View Source</button>
+            <button class="custom-quality__view-source customaudio-btn">
+              View Source
+            </button>
           </div>
         </fieldset>
         <fieldset class="downloader__fieldset post-processing">
           <div class="post-processing__selector">
             <label for="postprocessing">Post-Processing</label>
-            <input type="checkbox" name="postprocessing" id="postprocessing" checked />
+            <input
+              type="checkbox"
+              name="postprocessing"
+              id="postprocessing"
+              checked
+            />
           </div>
 
           <p class="post-processing__explain">
             MOST USERS: Leave this option <b>enabled</b>! <br />
-            This option determines whether or not the downloader should be allowed to use FFMPEG after downloading from
-            YouTube. This allows qualities/containers to be manipulated allowing for better and more customized
-            downloads.
+            This option determines whether or not the downloader should be
+            allowed to use FFMPEG after downloading from YouTube. This allows
+            qualities/containers to be manipulated allowing for better and more
+            customized downloads.
           </p>
         </fieldset>
       </form>
@@ -166,7 +187,9 @@
         </template>
         <ul class="downloads__list">
           <li class="downloads__item downloading">
-            <h5 class="downloads__name">TheFatRat - Unity UnityUnityUnityUUnityUnitynityUnity.mp3</h5>
+            <h5 class="downloads__name">
+              TheFatRat - Unity UnityUnityUnityUUnityUnitynityUnity.mp3
+            </h5>
             <div class="downloads__actions">
               <button class="downloads__action-btn">
                 <i class="fa-regular fa-arrow-down-to-line"></i>
@@ -189,7 +212,12 @@
       <ul class="footer__contacts">
         <li class="footer__contacts-item">Emperor of Bluegaria#3725</li>
         <li class="footer__contacts-item">
-          <a href="https://github.com/Jack-the-Pro101" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a
+            href="https://github.com/Jack-the-Pro101"
+            target="_blank"
+            rel="noopener noreferrer"
+            >GitHub</a
+          >
         </li>
       </ul>
     </footer>

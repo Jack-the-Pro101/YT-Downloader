@@ -10,4 +10,6 @@ router.get("/info", async (req, res) => {
   res.json(await getInfo(url));
 });
 
+router.ws("/ws", async (ws, req) => {});
+
 module.exports = router;
