@@ -12,7 +12,10 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
 
     <link rel="stylesheet" href="./assets/css/style.css" />
 
@@ -35,7 +38,16 @@
     <main class="downloader">
       <form action="#" class="downloader__form">
         <fieldset class="downloader__fieldset url">
-          <input class="url__input" type="url" name="url" id="url" placeholder="Input video URL..." maxlength="1000" autocomplete="off" required />
+          <input
+            class="url__input"
+            type="url"
+            name="url"
+            id="url"
+            placeholder="Input video URL..."
+            maxlength="1000"
+            autocomplete="off"
+            required
+          />
           <button class="url__download-btn">Download</button>
         </fieldset>
         <fieldset class="downloader__fieldset options">
@@ -121,19 +133,37 @@
 
           <p class="post-processing__explain">
             MOST USERS: Leave this option <b>enabled</b>! <br />
-            This option determines whether or not the downloader should be allowed to use FFMPEG after downloading from YouTube. This allows
-            qualities/containers to be manipulated allowing for better and more customized downloads.
+            This option determines whether or not the downloader should be allowed to use FFMPEG after downloading from
+            YouTube. This allows qualities/containers to be manipulated allowing for better and more customized
+            downloads.
           </p>
         </fieldset>
       </form>
     </main>
 
     <div class="downloads">
-      <button class="downloads__header">
+      <button class="downloads__header" type="button">
         Downloads
         <i class="fa-regular fa-chevron-down"></i>
       </button>
       <div class="downloads__list-container">
+        <template id="downloads-item-template">
+          <li class="downloads__item downloading">
+            <h5 class="downloads__name"></h5>
+            <div class="downloads__actions">
+              <button class="downloads__action-btn">
+                <i class="fa-regular fa-arrow-down-to-line"></i>
+              </button>
+              <button class="downloads__action-btn">
+                <i class="fa-regular fa-xmark"></i>
+              </button>
+            </div>
+            <span class="downloads__progress-text">0%</span>
+            <div class="progress__progress-container">
+              <div class="downloads__progress-bar"></div>
+            </div>
+          </li>
+        </template>
         <ul class="downloads__list">
           <li class="downloads__item downloading">
             <h5 class="downloads__name">TheFatRat - Unity UnityUnityUnityUUnityUnitynityUnity.mp3</h5>
