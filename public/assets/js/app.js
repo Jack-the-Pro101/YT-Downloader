@@ -278,5 +278,17 @@ window.ws.addEventListener("message", (e) => {
 
       break;
     }
+    case "beginPost": {
+      for (let i = 0; i < downloadsItems.length; i++) {
+        const item = downloadsItems[i];
+
+        if (item.dataset.id === data.id) {
+          item.querySelector(".downloads__progress-text").innerText = "Processing...";
+
+          break;
+        }
+      }
+      break;
+    }
   }
 });

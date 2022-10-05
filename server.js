@@ -13,8 +13,6 @@ const path = require("path");
 
 const { spawn } = require("child_process");
 
-const ffmpegStatic = require("ffmpeg-static");
-
 (async function () {
   console.time("Start");
 

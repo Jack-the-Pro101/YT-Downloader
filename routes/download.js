@@ -8,7 +8,8 @@ const { validateURL, getWsClient } = require("../utils");
 const { download } = require("../wrapper");
 
 router.get("/", (req, res) => {
-  if (!fs.existsSync(path.join(process.cwd(), "./tmp"))) fs.mkdirSync(path.join(process.cwd(), "./tmp"));
+  if (!fs.existsSync(path.join(process.cwd(), "./tmp")))
+    fs.mkdirSync(path.join(process.cwd(), "./tmp"));
 
   const url = req.query.url;
   const info = JSON.parse(req.query.info);
@@ -49,6 +50,15 @@ router.get("/", (req, res) => {
         })
       );
     }
+  });
+
+  downloader.once("post", (id) => {
+    client.send(
+      JSON.stringify({
+        type: "beginPost",
+        id,
+      })
+    );
   });
 
   downloader.on("progress", (progress) => {

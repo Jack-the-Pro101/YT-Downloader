@@ -381,6 +381,9 @@ input[type="checkbox"] {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 600;
+  font-size: 1.75rem;
+  color: var(--clr-neutral-800);
 }
 
 .downloads__actions {

@@ -1,6 +1,6 @@
 const { validateURL, getURLVideoID } = require("./utils");
 
-const ffmpegStatic = require("ffmpeg-static");
+const { getFfmpegPath } = require("./utils");
 
 const { spawn, spawnSync } = require("child_process");
 
@@ -25,7 +25,7 @@ const interact = (url, args = []) => {
     "--output",
     path.join(process.cwd(), "/tmp/") + "%(title)s.%(ext)s",
     "--ffmpeg-location",
-    ffmpegStatic,
+    getFfmpegPath(),
     "--restrict-filenames",
     url,
   ]);
@@ -87,6 +87,8 @@ exports.download = (url, info) => {
     "echo =%(filepath)s",
     "--print",
     "before_dl:<%(title)s",
+    "--print",
+    "post_process:>+",
     "--progress-template",
     "-%(progress.status)s,%(progress._total_bytes_str)s,%(progress._percent_str)s,%(progress._speed_str)s,%(progress._eta_str)s",
   ];
@@ -184,13 +186,13 @@ exports.download = (url, info) => {
     console.log(text);
 
     if (text.startsWith("-")) {
-      const info = text.slice(1).split(/\,/g);
+      const data = text.slice(1).split(/\,/g);
 
-      const status = info[0];
-      const totalSize = info[1];
-      const percent = info[2];
-      const speed = info[3];
-      const eta = info[4];
+      const status = data[0];
+      const totalSize = data[1];
+      const percent = data[2];
+      const speed = data[3];
+      const eta = data[4];
 
       if (status === "downloading") {
         emitter.emit("progress", {
@@ -201,28 +203,9 @@ exports.download = (url, info) => {
           speed,
           eta,
         });
-      } else {
-        switch (info.format) {
-          case constants.FORMATS.AUDIO:
-            downloadStatus.audio = true;
-            break;
-          case constants.FORMATS.VIDEO:
-            downloadStatus.video = true;
-            break;
-          case constants.FORMATS.VIDEOAUDIO:
-            downloadStatus.video = true;
-
-            if (downloadStatus.video) {
-              downloadStatus.audio = true;
-            }
-            break;
-        }
-
-        emitter.emit("downloaded", {
-          id: downloadId,
-          status: downloadStatus,
-        });
       }
+    } else if (text.startsWith(">+")) {
+      emitter.emit("post", downloadId);
     } else if (text.startsWith("=")) {
       emitter.emit("finish", path.basename(text.slice(1)).trim(), downloadId);
     } else if (text.startsWith("<")) {
