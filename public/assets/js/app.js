@@ -24,6 +24,12 @@ const customQualityCheckbox = document.querySelector("#custom");
 const containerSelect = document.querySelector("#container");
 
 const downloadsList = document.querySelector(".downloads__list");
+const downloadsCollapseBtn = document.querySelector(".downloads__header");
+const downloads = document.querySelector(".downloads");
+
+const downloadsItems = document.getElementsByClassName("downloads__item");
+
+const downloadsTemplate = document.querySelector("#downloads-item-template");
 
 const state = { url: "", data: null };
 
@@ -199,9 +205,34 @@ form.addEventListener("submit", async (e) => {
     container,
   };
 
+  const downloadId = uuidv4();
+
   const urlParams = new URLSearchParams();
   urlParams.append("url", state.url);
   urlParams.append("info", JSON.stringify(payload));
+  urlParams.append("id", downloadId);
+
+  state.url = "";
+  state.data = null;
+  url.value = state.url;
+
+  const downloadItem = downloadsTemplate.content.cloneNode(true);
+  downloadItem.querySelector(".downloads__name").innerText = "Preparing download...";
+  downloadItem.querySelector(".downloads__item").dataset.id = downloadId;
+
+  downloadItem.querySelector("[data-del]").addEventListener("click", () => {
+    for (let i = 0; i < downloadsItems.length; i++) {
+      const item = downloadsItems[i];
+      if (item.dataset.id === downloadId) {
+        URL.revokeObjectURL(item.querySelector("[data-dl]").href);
+        item.remove();
+
+        break;
+      }
+    }
+  });
+
+  downloadsList.children.length > 0 ? downloadsList.insertBefore(downloadItem, downloadsList.children[0]) : downloadsList.appendChild(downloadItem);
 
   const download = await fetch("download?" + urlParams.toString(), {
     method: "GET",
@@ -228,13 +259,6 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-const downloadsCollapseBtn = document.querySelector(".downloads__header");
-const downloads = document.querySelector(".downloads");
-
-const downloadsItems = document.getElementsByClassName("downloads__item");
-
-const downloadsTemplate = document.querySelector("#downloads-item-template");
-
 downloadsCollapseBtn.addEventListener("click", () => {
   downloads.classList.toggle("collapsed");
 });
@@ -244,24 +268,14 @@ window.ws.addEventListener("message", (e) => {
 
   switch (data.type) {
     case "begin": {
-      const downloadItem = downloadsTemplate.content.cloneNode(true);
-      downloadItem.querySelector(".downloads__name").innerText = data.title;
-      downloadItem.querySelector(".downloads__item").dataset.id = data.id;
+      for (let i = 0; i < downloadsItems.length; i++) {
+        const item = downloadsItems[i];
+        if (item.dataset.id === data.id) {
+          item.querySelector(".downloads__name").innerText = data.title;
 
-      downloadItem.querySelector("[data-del]").addEventListener("click", () => {
-        for (let i = 0; i < downloadsItems.length; i++) {
-          const item = downloadsItems[i];
-          if (item.dataset.id === data.id) {
-            URL.revokeObjectURL(item.querySelector("[data-dl]").href);
-            item.remove();
-
-            break;
-          }
+          break;
         }
-      });
-
-      downloadsList.children.length > 0 ? downloadsList.insertBefore(downloadItem, downloadsList.children[0]) : downloadsList.appendChild(downloadItem);
-
+      }
       break;
     }
     case "progress": {

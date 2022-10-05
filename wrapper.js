@@ -59,7 +59,7 @@ exports.getInfo = async (url) => {
   }
 };
 
-exports.download = (url, info) => {
+exports.download = (url, info, downloadId) => {
   if (!validateURL(url)) return false;
 
   // ctx_id: "None";
@@ -79,8 +79,6 @@ exports.download = (url, info) => {
   // _speed_str: "   8.03MiB/s";
   // _total_bytes_estimate_str: "N/A";
   // _total_bytes_str: "2.92MiB";
-
-  const downloadId = uuid();
 
   const args = [
     "--exec",
@@ -108,7 +106,7 @@ exports.download = (url, info) => {
         break;
       case constants.FORMATS.VIDEOAUDIO:
         if (info.postProcessing) {
-          args.push("--format", `${info.quality.value.audio}+${info.quality.value.video}`, "--merge-output-format", info.container);
+          args.push("--format", `${info.quality.value.video}+${info.quality.value.audio}`, "--merge-output-format", info.container);
         }
         break;
 

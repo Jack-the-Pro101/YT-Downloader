@@ -7,16 +7,20 @@ const path = require("path");
 const { validateURL, getWsClient } = require("../utils");
 const { download } = require("../wrapper");
 
+const { validate: validateUUID } = require("uuid");
+
 router.get("/", (req, res) => {
-  if (!fs.existsSync(path.join(process.cwd(), "./tmp")))
-    fs.mkdirSync(path.join(process.cwd(), "./tmp"));
+  if (!fs.existsSync(path.join(process.cwd(), "./tmp"))) fs.mkdirSync(path.join(process.cwd(), "./tmp"));
 
   const url = req.query.url;
   const info = JSON.parse(req.query.info);
+  const downloadId = req.query.id;
 
   if (url == null || !validateURL(url)) return res.sendStatus(400);
 
-  const downloader = download(url, info);
+  const downloader = download(url, info, downloadId);
+
+  if (!validateUUID(downloadId)) return res.sendStatus(400);
 
   const client = getWsClient(req.cookies["YTDL_CLIENT_ID"]);
 
@@ -33,6 +37,8 @@ router.get("/", (req, res) => {
   });
 
   downloader.on("downloaded", ({ id, status }) => {
+    if (client == null) return;
+
     if (status.video) {
       client.send(
         JSON.stringify({
@@ -53,6 +59,8 @@ router.get("/", (req, res) => {
   });
 
   downloader.once("post", (id) => {
+    if (client == null) return;
+
     client.send(
       JSON.stringify({
         type: "beginPost",
