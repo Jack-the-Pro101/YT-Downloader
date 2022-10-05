@@ -173,11 +173,7 @@ body {
   color: var(--clr-neutral-900);
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.65);
   background-color: var(--clr-primary-500);
-  background-image: linear-gradient(
-    45deg,
-    var(--clr-primary-500),
-    var(--clr-comp3)
-  );
+  background-image: linear-gradient(45deg, var(--clr-primary-500), var(--clr-comp3));
   background-position: bottom left;
   background-size: 200%;
   background-repeat: no-repeat;
@@ -276,11 +272,7 @@ body {
   border: none;
   color: var(--clr-neutral-900);
   text-shadow: 0 0 8px var(--clr-neutral-100);
-  background-image: linear-gradient(
-    45deg,
-    var(--clr-accent),
-    var(--clr-accent2)
-  );
+  background-image: linear-gradient(45deg, var(--clr-accent), var(--clr-accent2));
   background-color: var(--clr-accent);
   cursor: pointer;
 }
@@ -397,6 +389,10 @@ input[type="checkbox"] {
   gap: 0.25em;
 }
 
+.downloads__actions a {
+  text-decoration: none;
+}
+
 .downloading .downloads__actions {
   display: none;
 }
@@ -447,7 +443,7 @@ input[type="checkbox"] {
   background-color: transparent;
   transition: transform 0.1s linear, background-color 0.3s ease-out;
   transform-origin: left;
-  transform: scaleX(0);
+  transform: scaleX(var(--percent));
 }
 
 .downloading .downloads__progress-bar {

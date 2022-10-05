@@ -4,12 +4,11 @@ const router = express.Router();
 const fs = require("fs");
 const path = require("path");
 
-const { validateURL } = require("../utils");
+const { validateURL, getWsClient } = require("../utils");
 const { download } = require("../wrapper");
 
 router.get("/", (req, res) => {
-  if (!fs.existsSync(path.join(process.cwd(), "./tmp")))
-    fs.mkdirSync(path.join(process.cwd(), "./tmp"));
+  if (!fs.existsSync(path.join(process.cwd(), "./tmp"))) fs.mkdirSync(path.join(process.cwd(), "./tmp"));
 
   const url = req.query.url;
   const info = JSON.parse(req.query.info);
@@ -18,10 +17,34 @@ router.get("/", (req, res) => {
 
   const downloader = download(url, info);
 
-  downloader.on("progress", (progress) => {});
+  const client = getWsClient(req.cookies["YTDL_CLIENT_ID"]);
 
-  downloader.once("finish", (dest) => {
+  downloader.once("begin", ({ id, title }) => {
+    if (client == null) return;
+
+    client.send(
+      JSON.stringify({
+        type: "begin",
+        id,
+        title,
+      })
+    );
+  });
+
+  downloader.on("progress", (progress) => {
+    if (client == null) return;
+
+    client.send(
+      JSON.stringify({
+        type: "progress",
+        progress,
+      })
+    );
+  });
+
+  downloader.once("finish", (dest, id) => {
     res.header("Filename", dest);
+    res.header("Id", id);
     res.sendFile(path.join(process.cwd(), "./tmp", dest));
   });
 });

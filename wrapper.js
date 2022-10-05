@@ -4,6 +4,8 @@ const ffmpegStatic = require("ffmpeg-static");
 
 const { spawn, spawnSync } = require("child_process");
 
+const { v4: uuid } = require("uuid");
+
 const path = require("path");
 const events = require("events");
 
@@ -78,9 +80,13 @@ exports.download = (url, info) => {
   // _total_bytes_estimate_str: "N/A";
   // _total_bytes_str: "2.92MiB";
 
+  const downloadId = uuid();
+
   const args = [
     "--exec",
     "echo =%(filepath)s",
+    "--print",
+    "before_dl:<%(title)s",
     "--progress-template",
     "-%(progress.status)s,%(progress._total_bytes_str)s,%(progress._percent_str)s,%(progress._speed_str)s,%(progress._eta_str)s",
   ];
@@ -90,33 +96,17 @@ exports.download = (url, info) => {
     switch (info.format) {
       case constants.FORMATS.AUDIO:
         if (info.postProcessing) {
-          args.push(
-            "--format",
-            info.quality.value.audio,
-            "--extract-audio",
-            "--audio-format",
-            info.container
-          );
+          args.push("--format", info.quality.value.audio, "--extract-audio", "--audio-format", info.container);
         }
         break;
       case constants.FORMATS.VIDEO:
         if (info.postProcessing) {
-          args.push(
-            "--format",
-            info.quality.value.video,
-            "--remux-video",
-            info.container
-          );
+          args.push("--format", info.quality.value.video, "--remux-video", info.container);
         }
         break;
       case constants.FORMATS.VIDEOAUDIO:
         if (info.postProcessing) {
-          args.push(
-            "--format",
-            `${info.quality.value.audio}+${info.quality.value.video}`,
-            "--merge-output-format",
-            info.container
-          );
+          args.push("--format", `${info.quality.value.audio}+${info.quality.value.video}`, "--merge-output-format", info.container);
         }
         break;
 
@@ -130,24 +120,13 @@ exports.download = (url, info) => {
       case constants.FORMATS.AUDIO:
         if (info.quality.value === constants.QUALITIES.HIGHEST) {
           if (info.postProcessing) {
-            args.push(
-              "--format",
-              "bestaudio",
-              "--extract-audio",
-              "--audio-format",
-              info.container
-            );
+            args.push("--format", "bestaudio", "--extract-audio", "--audio-format", info.container);
           } else {
             args.push("--format", "bestaudio");
           }
         } else {
           if (info.postProcessing) {
-            args.push(
-              "--format",
-              "worstaudio",
-              "--audio-format",
-              info.container
-            );
+            args.push("--format", "worstaudio", "--audio-format", info.container);
           } else {
             args.push("--format", "worstaudio");
           }
@@ -163,12 +142,7 @@ exports.download = (url, info) => {
           }
         } else {
           if (info.postProcessing) {
-            args.push(
-              "--format",
-              "worstaudio",
-              "--remux-video",
-              info.container
-            );
+            args.push("--format", "worstaudio", "--remux-video", info.container);
           } else {
             args.push("--format", "worstaudio");
           }
@@ -178,23 +152,13 @@ exports.download = (url, info) => {
       case constants.FORMATS.VIDEOAUDIO:
         if (info.quality.value === constants.QUALITIES.HIGHEST) {
           if (info.postProcessing) {
-            args.push(
-              "--format",
-              "bestvideo+bestaudio",
-              "--merge-output-format",
-              info.container
-            );
+            args.push("--format", "bestvideo+bestaudio", "--merge-output-format", info.container);
           } else {
             args.push("--format", "bestvideo+bestaudio");
           }
         } else {
           if (info.postProcessing) {
-            args.push(
-              "--format",
-              "worstvideo+worstaudio",
-              "--merge-output-format",
-              info.container
-            );
+            args.push("--format", "worstvideo+worstaudio", "--merge-output-format", info.container);
           } else {
             args.push("--format", "worstvideo+worstaudio");
           }
@@ -210,12 +174,12 @@ exports.download = (url, info) => {
   const process = interact(url, args);
 
   process.stdout.on("data", (data) => {
-    const text = data.toString();
+    const text = data.toString().trim();
 
     console.log(text);
 
     if (text.startsWith("-")) {
-      const info = text.split(/\,/g);
+      const info = text.slice(1).split(/\,/g);
 
       const status = info[0];
       const totalSize = info[1];
@@ -225,6 +189,7 @@ exports.download = (url, info) => {
 
       if (status === "downloading") {
         emitter.emit("progress", {
+          id: downloadId,
           status,
           totalSize,
           percent,
@@ -235,7 +200,9 @@ exports.download = (url, info) => {
         emitter.emit("downloaded");
       }
     } else if (text.startsWith("=")) {
-      emitter.emit("finish", path.basename(text.slice(1)).trim());
+      emitter.emit("finish", path.basename(text.slice(1)).trim(), downloadId);
+    } else if (text.startsWith("<")) {
+      emitter.emit("begin", { id: downloadId, title: text.slice(1) });
     }
   });
   process.stderr.on("data", (data) => {

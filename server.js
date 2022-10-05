@@ -4,7 +4,7 @@ const express = require("express");
 const ejs = require("ejs");
 const open = require("open");
 const cookieParser = require("cookie-parser");
-const { uuid } = require("uuidv4");
+const { v4: uuid } = require("uuid");
 
 const chalk = require("chalk");
 
@@ -38,10 +38,11 @@ const ffmpegStatic = require("ffmpeg-static");
   app.use(cookieParser());
   app.use(express.static(path.join(__dirname, "./public")));
 
-  app.use((req, res) => {
-    if (req.cookies["clientID"] == null) {
-      res.cookie("clientID", uuid(), {});
+  app.use((req, res, next) => {
+    if (req.cookies["YTDL_CLIENT_ID"] == null) {
+      res.cookie("YTDL_CLIENT_ID", uuid(), { path: "/" });
     }
+    next();
   });
 
   const routesPath = "/routes/";
@@ -55,10 +56,7 @@ const ffmpegStatic = require("ffmpeg-static");
 
   routerFiles.forEach(async function (file) {
     const fileBase = path.basename(file, path.extname(file));
-    const routerPath = path.join(
-      __dirname,
-      routesPath + fileBase + path.extname(file)
-    );
+    const routerPath = path.join(__dirname, routesPath + fileBase + path.extname(file));
     const router = require(routerPath);
 
     if (preconfiguredRoutes[fileBase] != null) {
@@ -90,11 +88,7 @@ const ffmpegStatic = require("ffmpeg-static");
       });
     });
   } else {
-    console.log(
-      chalk.green(
-        "Development environment enabled, skipping version check for start up time..."
-      )
-    );
+    console.log(chalk.green("Development environment enabled, skipping version check for start up time..."));
   }
 
   app.listen(710, (err) => {

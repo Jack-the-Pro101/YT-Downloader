@@ -23,6 +23,8 @@ const customQualityCheckbox = document.querySelector("#custom");
 
 const containerSelect = document.querySelector("#container");
 
+const downloadsList = document.querySelector(".downloads__list");
+
 const state = { url: "", data: null };
 
 url.addEventListener("input", () => {
@@ -207,18 +209,68 @@ form.addEventListener("submit", async (e) => {
 
   const blob = await download.blob();
 
-  const downloadURL = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = downloadURL;
-  a.download = download.headers.get("Filename") || "Download";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  const downloadURL = URL.createObjectURL(blob);
+
+  for (let i = 0; i < downloadsItems.length; i++) {
+    const item = downloadsItems[i];
+
+    if (item.dataset.id === download.headers.get("Id")) {
+      const a = item.querySelector("[data-dl]");
+
+      a.href = downloadURL;
+      a.download = download.headers.get("Filename") || "Download";
+      a.click();
+
+      item.classList.remove("downloading");
+    }
+  }
 });
 
 const downloadsCollapseBtn = document.querySelector(".downloads__header");
 const downloads = document.querySelector(".downloads");
 
+const downloadsItems = document.getElementsByClassName("downloads__item");
+
+const downloadsTemplate = document.querySelector("#downloads-item-template");
+
 downloadsCollapseBtn.addEventListener("click", () => {
   downloads.classList.toggle("collapsed");
+});
+
+window.ws.addEventListener("message", (e) => {
+  const data = JSON.parse(e.data);
+
+  switch (data.type) {
+    case "begin": {
+      const downloadItem = downloadsTemplate.content.cloneNode(true);
+      downloadItem.querySelector(".downloads__name").innerText = data.title;
+      downloadItem.querySelector(".downloads__item").dataset.id = data.id;
+
+      downloadItem.querySelector("[data-del]").addEventListener("click", () => {
+        for (let i = 0; i < downloadsItems.length; i++) {
+          const item = downloadsItems[i];
+          if (item.dataset.id === data.id) {
+            URL.revokeObjectURL(item.querySelector("[data-dl]").href);
+            item.remove();
+          }
+        }
+      });
+
+      downloadsList.children.length > 0 ? downloadsList.insertBefore(downloadItem, downloadsList.children[0]) : downloadsList.appendChild(downloadItem);
+
+      break;
+    }
+    case "progress": {
+      for (let i = 0; i < downloadsItems.length; i++) {
+        const item = downloadsItems[i];
+
+        if (item.dataset.id === data.progress.id) {
+          item.querySelector(".downloads__progress-bar").style = `--percent: ${data.progress.percent}`;
+          item.querySelector(".downloads__progress-text").innerText = data.progress.percent;
+        }
+      }
+
+      break;
+    }
+  }
 });

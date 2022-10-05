@@ -79,3 +79,9 @@ exports.validateURL = (string) => {
     return false;
   }
 };
+
+exports.getWsClient = (id) => {
+  return Array.from(websocket.getWss().clients).find((socket) => {
+    return socket.id === id;
+  });
+};
