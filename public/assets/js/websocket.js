@@ -46,7 +46,7 @@
 
     window.ws.timeout = setTimeout(() => {
       disconnected();
-      clearInterval(window.ws.timeout);
+      clearTimeout(window.ws.timeout);
       window.ws.timeout = null;
     }, 5000);
   }

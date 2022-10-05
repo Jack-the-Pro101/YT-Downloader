@@ -173,6 +173,11 @@ exports.download = (url, info) => {
 
   const process = interact(url, args);
 
+  const downloadStatus = {
+    video: false,
+    audio: false,
+  };
+
   process.stdout.on("data", (data) => {
     const text = data.toString().trim();
 
@@ -197,7 +202,26 @@ exports.download = (url, info) => {
           eta,
         });
       } else {
-        emitter.emit("downloaded");
+        switch (info.format) {
+          case constants.FORMATS.AUDIO:
+            downloadStatus.audio = true;
+            break;
+          case constants.FORMATS.VIDEO:
+            downloadStatus.video = true;
+            break;
+          case constants.FORMATS.VIDEOAUDIO:
+            downloadStatus.video = true;
+
+            if (downloadStatus.video) {
+              downloadStatus.audio = true;
+            }
+            break;
+        }
+
+        emitter.emit("downloaded", {
+          id: downloadId,
+          status: downloadStatus,
+        });
       }
     } else if (text.startsWith("=")) {
       emitter.emit("finish", path.basename(text.slice(1)).trim(), downloadId);

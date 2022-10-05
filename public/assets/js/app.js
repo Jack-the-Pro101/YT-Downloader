@@ -222,6 +222,8 @@ form.addEventListener("submit", async (e) => {
       a.click();
 
       item.classList.remove("downloading");
+
+      break;
     }
   }
 });
@@ -252,6 +254,8 @@ window.ws.addEventListener("message", (e) => {
           if (item.dataset.id === data.id) {
             URL.revokeObjectURL(item.querySelector("[data-dl]").href);
             item.remove();
+
+            break;
           }
         }
       });
@@ -267,6 +271,8 @@ window.ws.addEventListener("message", (e) => {
         if (item.dataset.id === data.progress.id) {
           item.querySelector(".downloads__progress-bar").style = `--percent: ${data.progress.percent}`;
           item.querySelector(".downloads__progress-text").innerText = data.progress.percent;
+
+          break;
         }
       }
 

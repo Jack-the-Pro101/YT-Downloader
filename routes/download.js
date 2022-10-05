@@ -31,6 +31,26 @@ router.get("/", (req, res) => {
     );
   });
 
+  downloader.on("downloaded", ({ id, status }) => {
+    if (status.video) {
+      client.send(
+        JSON.stringify({
+          type: "downloaded",
+          id,
+          format: "video",
+        })
+      );
+    } else if (status.audio) {
+      client.send(
+        JSON.stringify({
+          type: "downloaded",
+          id,
+          format: "audio",
+        })
+      );
+    }
+  });
+
   downloader.on("progress", (progress) => {
     if (client == null) return;
 
