@@ -4,7 +4,7 @@ const { getFfmpegPath } = require("./utils");
 
 const { spawn, spawnSync } = require("child_process");
 
-const { v4: uuid } = require("uuid");
+const { ytDlpPath } = require("./constants");
 
 const path = require("path");
 const events = require("events");
@@ -14,13 +14,13 @@ const VideosCacheStore = require("./classes/VideosCacheStore");
 const constants = require("./constants");
 
 const interactSync = (url, args = []) => {
-  return spawnSync("./downloader/yt-dlp.exe", [...args, url], {
+  return spawnSync(ytDlpPath(), [...args, url], {
     encoding: "utf8",
   });
 };
 
 const interact = (url, args = []) => {
-  const child = spawn("./downloader/yt-dlp.exe", [
+  const child = spawn(ytDlpPath(), [
     ...args,
     "--output",
     path.join(process.cwd(), "/tmp/") + "%(title)s.%(ext)s",

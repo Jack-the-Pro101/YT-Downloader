@@ -90,7 +90,7 @@ const ffmpegStatic = require("ffmpeg-static");
 
 exports.getFfmpegPath = () => {
   if (process.env.NODE_ENV === "production") {
-    return process.env.FFMPEG_PATH;
+    return process.env.BINARY_PATH;
   } else {
     return ffmpegStatic;
   }

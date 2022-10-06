@@ -64,38 +64,53 @@ const { spawn } = require("child_process");
     }
   });
 
-  if (process.env.DEV !== "true") {
-    console.log(chalk.green("Checking for downloader updates..."));
-    const updater = spawn("./downloader/yt-dlp.exe", ["-U"]);
+  // Handled by wrapper
 
-    await new Promise((resolve, reject) => {
-      updater.stdout.on("data", (data) => {
-        const text = data.toString("utf-8");
+  // if (process.env.DEV !== "true") {
+  //   console.log(chalk.green("Checking for downloader updates..."));
+  //   const updater = spawn("./downloader/yt-dlp.exe", ["-U"]);
 
-        if (text.includes("is up to date")) {
-          console.log(text);
-          return resolve();
-        } else if (text.includes("Updating")) {
-          console.log(text);
-          return resolve();
-        }
+  //   await new Promise((resolve, reject) => {
+  //     updater.stdout.on("data", (data) => {
+  //       const text = data.toString("utf-8");
 
-        setTimeout(() => {
-          reject();
-        }, 20000);
-      });
+  //       if (text.includes("is up to date")) {
+  //         console.log(text);
+  //         return resolve();
+  //       } else if (text.includes("Updating")) {
+  //         console.log(text);
+  //         return resolve();
+  //       }
+
+  //       setTimeout(() => {
+  //         reject();
+  //       }, 20000);
+  //     });
+  //   });
+  // } else {
+  //   console.log(chalk.green("Development environment enabled, skipping version check for start up time..."));
+  // }
+
+  try {
+    app.listen(710, () => {
+      console.log(chalk.greenBright("Server online"));
+      console.timeEnd("Start");
+
+      if (!process.env.DEV) {
+        console.log("Launching client...");
+        open("http://localhost:710");
+      }
     });
-  } else {
-    console.log(chalk.green("Development environment enabled, skipping version check for start up time..."));
-  }
 
-  app.listen(710, (err) => {
+    return;
+  } catch (err) {}
+  const server = app.listen(0, () => {
     console.log(chalk.greenBright("Server online"));
     console.timeEnd("Start");
 
     if (!process.env.DEV) {
       console.log("Launching client...");
-      open("http://localhost:710");
+      open("http://localhost:" + server.address().port);
     }
   });
 })();

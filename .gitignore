@@ -3,3 +3,5 @@ out
 .env
 tmp
 dist
+yt-downloader-wrapper/target/*
+yt-downloader-wrapper/src/yt-dlp.exe
