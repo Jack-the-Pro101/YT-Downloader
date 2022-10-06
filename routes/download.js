@@ -83,7 +83,18 @@ router.get("/", (req, res) => {
   downloader.once("finish", (dest, id) => {
     res.header("Filename", dest);
     res.header("Id", id);
-    res.sendFile(path.join(process.cwd(), "./tmp", dest));
+
+    const absPath = path.join(process.cwd(), "./tmp");
+
+    res.sendFile(dest, { root: absPath }, (err) => {
+      if (err) {
+        console.error(err);
+      } else {
+        if (process.env.NODE_ENV === "production") {
+          fs.unlinkSync(path.join(absPath, dest));
+        }
+      }
+    });
   });
 });
 

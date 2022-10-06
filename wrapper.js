@@ -97,16 +97,22 @@ exports.download = (url, info, downloadId) => {
       case constants.FORMATS.AUDIO:
         if (info.postProcessing) {
           args.push("--format", info.quality.value.audio, "--extract-audio", "--audio-format", info.container);
+        } else {
+          args.push("--format", `${info.quality.value.audio}`);
         }
         break;
       case constants.FORMATS.VIDEO:
         if (info.postProcessing) {
           args.push("--format", info.quality.value.video, "--remux-video", info.container);
+        } else {
+          args.push("--format", info.quality.value.video);
         }
         break;
       case constants.FORMATS.VIDEOAUDIO:
         if (info.postProcessing) {
           args.push("--format", `${info.quality.value.video}+${info.quality.value.audio}`, "--merge-output-format", info.container);
+        } else {
+          args.push("--format", `${info.quality.value.video}+${info.quality.value.audio}`);
         }
         break;
 
@@ -114,8 +120,6 @@ exports.download = (url, info, downloadId) => {
         break;
     }
   } else {
-    console.log(info);
-
     switch (info.format) {
       case constants.FORMATS.AUDIO:
         if (info.quality.value === constants.QUALITIES.HIGHEST) {
@@ -171,17 +175,15 @@ exports.download = (url, info, downloadId) => {
     }
   }
 
-  const process = interact(url, args);
+  console.log("Recieved request...");
+  const worker = interact(url, args);
 
-  const downloadStatus = {
-    video: false,
-    audio: false,
-  };
-
-  process.stdout.on("data", (data) => {
+  worker.stdout.on("data", (data) => {
     const text = data.toString().trim();
 
-    console.log(text);
+    if (process.env.NODE_ENV !== "production") {
+      console.log(text);
+    }
 
     if (text.startsWith("-")) {
       const data = text.slice(1).split(/\,/g);
@@ -210,7 +212,7 @@ exports.download = (url, info, downloadId) => {
       emitter.emit("begin", { id: downloadId, title: text.slice(1) });
     }
   });
-  process.stderr.on("data", (data) => {
+  worker.stderr.on("data", (data) => {
     console.log(data.toString());
   });
 

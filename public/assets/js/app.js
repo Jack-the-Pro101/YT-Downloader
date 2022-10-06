@@ -32,6 +32,7 @@ const downloadsItems = document.getElementsByClassName("downloads__item");
 const downloadsTemplate = document.querySelector("#downloads-item-template");
 
 const state = { url: "", data: null };
+const downloadsMap = {};
 
 url.addEventListener("input", () => {
   if (url.value !== state.url) {
@@ -221,18 +222,21 @@ form.addEventListener("submit", async (e) => {
   downloadItem.querySelector(".downloads__item").dataset.id = downloadId;
 
   downloadItem.querySelector("[data-del]").addEventListener("click", () => {
-    for (let i = 0; i < downloadsItems.length; i++) {
-      const item = downloadsItems[i];
-      if (item.dataset.id === downloadId) {
-        URL.revokeObjectURL(item.querySelector("[data-dl]").href);
-        item.remove();
-
-        break;
-      }
-    }
+    const item = downloadsMap[downloadId];
+    URL.revokeObjectURL(item.querySelector("[data-dl]").href);
+    item.remove();
+    delete downloadsMap[downloadId];
   });
 
   downloadsList.children.length > 0 ? downloadsList.insertBefore(downloadItem, downloadsList.children[0]) : downloadsList.appendChild(downloadItem);
+
+  for (let i = 0; i < downloadsItems.length; i++) {
+    const item = downloadsItems[i];
+    if (item.dataset.id === downloadId) {
+      downloadsMap[downloadId] = item;
+      break;
+    }
+  }
 
   const download = await fetch("download?" + urlParams.toString(), {
     method: "GET",
@@ -242,21 +246,15 @@ form.addEventListener("submit", async (e) => {
 
   const downloadURL = URL.createObjectURL(blob);
 
-  for (let i = 0; i < downloadsItems.length; i++) {
-    const item = downloadsItems[i];
+  const item = downloadsMap[download.headers.get("Id")];
 
-    if (item.dataset.id === download.headers.get("Id")) {
-      const a = item.querySelector("[data-dl]");
+  const a = item.querySelector("[data-dl]");
 
-      a.href = downloadURL;
-      a.download = download.headers.get("Filename") || "Download";
-      a.click();
+  a.href = downloadURL;
+  a.download = download.headers.get("Filename") || "Download";
+  a.click();
 
-      item.classList.remove("downloading");
-
-      break;
-    }
-  }
+  item.classList.remove("downloading");
 });
 
 downloadsCollapseBtn.addEventListener("click", () => {
@@ -268,40 +266,26 @@ window.ws.addEventListener("message", (e) => {
 
   switch (data.type) {
     case "begin": {
-      for (let i = 0; i < downloadsItems.length; i++) {
-        const item = downloadsItems[i];
-        if (item.dataset.id === data.id) {
-          item.querySelector(".downloads__name").innerText = data.title;
+      const item = downloadsMap[data.id];
 
-          break;
-        }
-      }
+      item.querySelector(".downloads__name").innerText = data.title;
+      item.querySelector(".downloads__name").title = data.title;
+
       break;
     }
     case "progress": {
-      for (let i = 0; i < downloadsItems.length; i++) {
-        const item = downloadsItems[i];
+      const item = downloadsMap[data.progress.id];
 
-        if (item.dataset.id === data.progress.id) {
-          item.querySelector(".downloads__progress-bar").style = `--percent: ${data.progress.percent}`;
-          item.querySelector(".downloads__progress-text").innerText = data.progress.percent;
-
-          break;
-        }
-      }
+      item.querySelector(".downloads__progress-bar").style = `--percent: ${data.progress.percent}`;
+      item.querySelector(".downloads__progress-text").innerText = data.progress.percent;
 
       break;
     }
     case "beginPost": {
-      for (let i = 0; i < downloadsItems.length; i++) {
-        const item = downloadsItems[i];
+      const item = downloadsMap[data.id];
 
-        if (item.dataset.id === data.id) {
-          item.querySelector(".downloads__progress-text").innerText = "Processing...";
+      item.querySelector(".downloads__progress-text").innerText = "Processing...";
 
-          break;
-        }
-      }
       break;
     }
   }

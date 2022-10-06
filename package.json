@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "description": "Stable universal YT downloader with web interface",
   "main": "server.js",
-  "bin": "index.js",
+  "bin": "server.js",
   "pkg": {
     "assets": [
       "views/**/*",
       "public/**/*",
-      "routes/**/*",
-      "node_modules/ffmpeg-static/*"
+      "routes/**/*"
     ],
     "scripts": "require.js",
     "outputPath": "dist"

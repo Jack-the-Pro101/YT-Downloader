@@ -64,7 +64,7 @@ const { spawn } = require("child_process");
     }
   });
 
-  if (!process.env.DEV) {
+  if (process.env.DEV !== "true") {
     console.log(chalk.green("Checking for downloader updates..."));
     const updater = spawn("./downloader/yt-dlp.exe", ["-U"]);
 
@@ -94,6 +94,7 @@ const { spawn } = require("child_process");
     console.timeEnd("Start");
 
     if (!process.env.DEV) {
+      console.log("Launching client...");
       open("http://localhost:710");
     }
   });
