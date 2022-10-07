@@ -81,7 +81,7 @@ router.get("/", (req, res) => {
   });
 
   downloader.on("error", (id) => {
-    res.status(400).send(id);
+    res.status(500).send(id);
   });
 
   downloader.once("finish", (dest, id) => {
