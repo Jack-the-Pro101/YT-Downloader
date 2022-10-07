@@ -214,6 +214,8 @@ exports.download = (url, info, downloadId) => {
   });
   worker.stderr.on("data", (data) => {
     console.log(data.toString());
+
+    emitter.emit("error", downloadId);
   });
 
   return emitter;

@@ -242,6 +242,17 @@ form.addEventListener("submit", async (e) => {
     method: "GET",
   });
 
+  if (!download.ok) {
+    const item = downloadsMap[downloadId];
+
+    item.querySelector(".downloads__progress-text").innerText = "FAILED";
+    item.classList.remove("downloading");
+
+    delete downloadsMap[downloadId];
+
+    return;
+  }
+
   const blob = await download.blob();
 
   const downloadURL = URL.createObjectURL(blob);
