@@ -54,7 +54,7 @@ exports.getInfo = async (url) => {
 
     return data;
   } else {
-    console.error(process.error);
+    console.log(process.stderr);
     return false;
   }
 };
@@ -214,7 +214,8 @@ exports.download = (url, info, downloadId) => {
   });
   worker.stderr.on("data", (data) => {
     console.log(data.toString());
-
+  });
+  worker.stderr.once("data", () => {
     emitter.emit("error", downloadId);
   });
 

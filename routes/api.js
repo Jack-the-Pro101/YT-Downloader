@@ -7,7 +7,10 @@ const { getInfo } = require("../wrapper");
 router.get("/info", async (req, res) => {
   const url = req.query.url;
 
-  res.json(await getInfo(url));
+  const data = await getInfo(url);
+  if (!data) return res.sendStatus(400);
+
+  res.json(data);
 });
 
 router.ws("/ws", async (ws, req) => {

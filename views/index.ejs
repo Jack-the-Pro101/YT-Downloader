@@ -117,6 +117,60 @@
             <button class="custom-quality__view-source customaudio-btn">View Source</button>
           </div>
         </fieldset>
+        <fieldset class="downloader__fieldset advanced">
+          <h2 class="downloader__heading">Advanced Options</h2>
+
+          <ul class="advanced__options">
+            <li class="advanced__option advanced__option--trim">
+              <h4 class="advanced__heading">Trim</h4>
+
+              <label for="trim1">Start</label>
+              <input type="number" name="trim1" id="trim1" min="0" step=".05" value="0" />
+
+              <label for="trim2">End</label>
+              <input type="number" name="trim2" id="trim2" min="0" step=".05" value="0" />
+            </li>
+            <li class="advanced__option advanced__option--reencode">
+              <h4 class="advanced__heading">Re-encode</h4>
+              <p class="advanced__info">Uses FFMPEG to re-encode video from YouTube into desired codec.</p>
+
+              <div class="advanced__option-reencoder">
+                <div class="advanced__option-container">
+                  <label for="video-reencode">Video</label>
+                  <select name="video-reencode" id="video-reencode">
+                    <option value="libx264">H.264 (CPU)</option>
+                    <option value="h264_amf">H.264 (GPU AMD)</option>
+                    <option value="h264_nvenc">H.264 (GPU NVIDIA)</option>
+                    <option value="h264_qsv">H.264 (CPU QSV)</option>
+                    <option value="libx265">H.265 (CPU)</option>
+                    <option value="hevc_amf">H.265 (GPU AMD)</option>
+                    <option value="hevc_nvenc">H.265 (GPU NVIDIA)</option>
+                    <option value="hevc_qsv">H.265 (CPU QSV)</option>
+
+                    <option value="libaom-av1">AV1 slower (CPU)</option>
+                    <option value="librav1e">AV1 faster (CPU)</option>
+                    <option value="libsvtav1">AV1 svtav1 (CPU)</option>
+                  </select>
+                </div>
+
+                <div class="advanced__option-container">
+                  <label for="audio-reencode">Audio</label>
+                  <select name="audio-reencode" id="audio-reencode">
+                    <option value="libmp3lame">MP3 / MPEG3</option>
+                    <option value="aac">AAC</option>
+                    <option value="vorbis">OGG / Vorbis</option>
+                  </select>
+                </div>
+
+                <label for="custom-codec-check">Custom</label>
+                <input type="checkbox" name="custom-codec-check" id="custom-codec-check" />
+
+                <label for="custom-codec">Codec</label>
+                <input type="text" name="custom-codec" id="custom-codec" maxlength="12" />
+              </div>
+            </li>
+          </ul>
+        </fieldset>
         <fieldset class="downloader__fieldset post-processing">
           <div class="post-processing__selector">
             <label for="postprocessing">Post-Processing</label>
@@ -141,6 +195,7 @@
         <template id="downloads-item-template">
           <li class="downloads__item downloading">
             <h5 class="downloads__name" title="...">...</h5>
+            <span class="downloads__progress-text">0%</span>
             <div class="downloads__actions">
               <a href="" data-dl tabindex="-1">
                 <button class="downloads__action-btn" title="Download">
@@ -150,15 +205,20 @@
               <button class="downloads__action-btn" data-del title="Remove">
                 <i class="fa-regular fa-xmark"></i>
               </button>
+              <button class="downloads__action-btn downloads__action-btn--cancel" data-cancel title="Cancel">
+                <i class="fa-regular fa-xmark"></i>
+              </button>
             </div>
-            <span class="downloads__progress-text">0%</span>
             <div class="progress__progress-container">
               <div class="downloads__progress-bar" style="--percent: 0%"></div>
             </div>
           </li>
         </template>
-        <ul class="downloads__list">
+        <ul class="downloads__list empty">
           <!-- Dynamically generated -->
+          <li class="downloads__empty-msg">
+            <p>No downloads yet.</p>
+          </li>
         </ul>
       </div>
     </div>
