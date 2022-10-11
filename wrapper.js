@@ -1,4 +1,4 @@
-const { validateURL, getURLVideoID } = require("./utils");
+const { validateURL, getURLVideoID } = require("./public/shared/shared");
 
 const { getFfmpegPath } = require("./utils");
 
@@ -11,7 +11,7 @@ const events = require("events");
 
 const VideosCacheStore = require("./classes/VideosCacheStore");
 
-const constants = require("./constants");
+const sharedConstants = require("./public/shared/shared");
 
 const interactSync = (url, args = []) => {
   return spawnSync(ytDlpPath(), [...args, url], {
@@ -94,21 +94,21 @@ exports.download = (url, info, downloadId) => {
 
   if (info.quality.custom) {
     switch (info.format) {
-      case constants.FORMATS.AUDIO:
+      case sharedConstants.FORMATS.AUDIO:
         if (info.postProcessing) {
           args.push("--format", info.quality.value.audio, "--extract-audio", "--audio-format", info.container);
         } else {
           args.push("--format", `${info.quality.value.audio}`);
         }
         break;
-      case constants.FORMATS.VIDEO:
+      case sharedConstants.FORMATS.VIDEO:
         if (info.postProcessing) {
           args.push("--format", info.quality.value.video, "--remux-video", info.container);
         } else {
           args.push("--format", info.quality.value.video);
         }
         break;
-      case constants.FORMATS.VIDEOAUDIO:
+      case sharedConstants.FORMATS.VIDEOAUDIO:
         if (info.postProcessing) {
           args.push("--format", `${info.quality.value.video}+${info.quality.value.audio}`, "--merge-output-format", info.container);
         } else {
@@ -121,8 +121,8 @@ exports.download = (url, info, downloadId) => {
     }
   } else {
     switch (info.format) {
-      case constants.FORMATS.AUDIO:
-        if (info.quality.value === constants.QUALITIES.HIGHEST) {
+      case sharedConstants.FORMATS.AUDIO:
+        if (info.quality.value === sharedConstants.QUALITIES.HIGHEST) {
           if (info.postProcessing) {
             args.push("--format", "bestaudio", "--extract-audio", "--audio-format", info.container);
           } else {
@@ -137,8 +137,8 @@ exports.download = (url, info, downloadId) => {
         }
 
         break;
-      case constants.FORMATS.VIDEO:
-        if (info.quality.value === constants.QUALITIES.HIGHEST) {
+      case sharedConstants.FORMATS.VIDEO:
+        if (info.quality.value === sharedConstants.QUALITIES.HIGHEST) {
           if (info.postProcessing) {
             args.push("--format", "bestvideo", "--remux-video", info.container);
           } else {
@@ -153,8 +153,8 @@ exports.download = (url, info, downloadId) => {
         }
 
         break;
-      case constants.FORMATS.VIDEOAUDIO:
-        if (info.quality.value === constants.QUALITIES.HIGHEST) {
+      case sharedConstants.FORMATS.VIDEOAUDIO:
+        if (info.quality.value === sharedConstants.QUALITIES.HIGHEST) {
           if (info.postProcessing) {
             args.push("--format", "bestvideo+bestaudio", "--merge-output-format", info.container);
           } else {
@@ -175,8 +175,14 @@ exports.download = (url, info, downloadId) => {
     }
   }
 
-  console.log("Recieved request...");
+  console.log("Recieved download request...");
   const worker = interact(url, args);
+
+  const partialData = {};
+
+  const cancel = () => {
+    return worker.kill(2);
+  };
 
   worker.stdout.on("data", (data) => {
     const text = data.toString().trim();
@@ -219,5 +225,8 @@ exports.download = (url, info, downloadId) => {
     emitter.emit("error", downloadId);
   });
 
-  return emitter;
+  return {
+    emitter,
+    cancel,
+  };
 };

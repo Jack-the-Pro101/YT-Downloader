@@ -16,19 +16,15 @@
 
     <link rel="stylesheet" href="./assets/css/style.css" />
 
-    <link rel="stylesheet" href="./assets/libs/fontawesome/all.css" />
+    <link rel="preload" href="./assets/libs/fontawesome/all.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="./assets/libs/fontawesome/all.css" /></noscript>
 
-    <script>
-      const FORMATS = <%- JSON.stringify(locals.FORMATS) %>;
-      const QUALITIES = <%- JSON.stringify(locals.QUALITIES) %>;
-      const AUDIO_CONTAINERS = <%- JSON.stringify(locals.AUDIO_CONTAINERS) %>;
-      const VIDEO_CONTAINERS = <%- JSON.stringify(locals.VIDEO_CONTAINERS) %>;
-    </script>
+    <script src="./shared/shared.js"></script>
 
     <script src="./assets/libs/uuidv4/uuidv4.js"></script>
 
     <script src="./assets/js/websocket.js"></script>
-
+    <script src="./assets/js/DownloadManager.js"></script>
     <script src="./assets/js/app.js" defer></script>
   </head>
   <body>
@@ -39,7 +35,7 @@
     <main class="downloader">
       <form action="#" class="downloader__form">
         <fieldset class="downloader__fieldset url">
-          <input class="url__input" type="url" name="url" id="url" placeholder="Input video URL..." maxlength="1000" autocomplete="off" required />
+          <input class="url__input" type="url" name="url" id="url" autofocus placeholder="Input video URL..." maxlength="1000" autocomplete="off" required />
           <button class="url__download-btn">Download</button>
         </fieldset>
         <fieldset class="downloader__fieldset options">
@@ -132,7 +128,7 @@
             </li>
             <li class="advanced__option advanced__option--reencode">
               <h4 class="advanced__heading">Re-encode</h4>
-              <p class="advanced__info">Uses FFMPEG to re-encode video from YouTube into desired codec.</p>
+              <p class="advanced__info">Uses FFMPEG to re-encode media from YouTube into desired codec.</p>
 
               <div class="advanced__option-reencoder">
                 <div class="advanced__option-container">
@@ -157,7 +153,7 @@
                   <label for="audio-reencode">Audio</label>
                   <select name="audio-reencode" id="audio-reencode">
                     <option value="libmp3lame">MP3 / MPEG3</option>
-                    <option value="aac">AAC</option>
+                    <option value="aac">AAC / MP4A</option>
                     <option value="vorbis">OGG / Vorbis</option>
                   </select>
                 </div>

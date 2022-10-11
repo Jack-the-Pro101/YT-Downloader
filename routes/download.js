@@ -4,7 +4,8 @@ const router = express.Router();
 const fs = require("fs");
 const path = require("path");
 
-const { validateURL, getWsClient } = require("../utils");
+const { getWsClient } = require("../utils");
+const { validateURL } = require("../public/shared/shared");
 const { download } = require("../wrapper");
 
 const { validate: validateUUID } = require("uuid");
@@ -17,14 +18,21 @@ router.get("/", (req, res) => {
   const downloadId = req.query.id;
 
   if (url == null || !validateURL(url)) return res.sendStatus(400);
+  if (!validateUUID(downloadId)) return res.sendStatus(400);
 
   const downloader = download(url, info, downloadId);
+  let done = false;
 
-  if (!validateUUID(downloadId)) return res.sendStatus(400);
+  res.once("close", () => {
+    if (!done) {
+      const killed = downloader.cancel();
+      console.log(killed);
+    }
+  });
 
   const client = getWsClient(req.cookies["YTDL_CLIENT_ID"]);
 
-  downloader.once("begin", ({ id, title }) => {
+  downloader.emitter.once("begin", ({ id, title }) => {
     if (client == null) return;
 
     client.send(
@@ -36,7 +44,7 @@ router.get("/", (req, res) => {
     );
   });
 
-  downloader.on("downloaded", ({ id, status }) => {
+  downloader.emitter.on("downloaded", ({ id, status }) => {
     if (client == null) return;
 
     if (status.video) {
@@ -58,7 +66,7 @@ router.get("/", (req, res) => {
     }
   });
 
-  downloader.once("post", (id) => {
+  downloader.emitter.once("post", (id) => {
     if (client == null) return;
 
     client.send(
@@ -69,7 +77,7 @@ router.get("/", (req, res) => {
     );
   });
 
-  downloader.on("progress", (progress) => {
+  downloader.emitter.on("progress", (progress) => {
     if (client == null) return;
 
     client.send(
@@ -80,15 +88,19 @@ router.get("/", (req, res) => {
     );
   });
 
-  downloader.on("error", (id) => {
+  downloader.emitter.on("error", (id) => {
     res.status(500).send(id);
   });
 
-  downloader.once("finish", (dest, id) => {
+  downloader.emitter.once("finish", (dest, id) => {
+    done = true;
+
     res.header("Filename", dest);
     res.header("Id", id);
 
     const absPath = path.join(process.cwd(), "./tmp");
+
+    if (res.closed) return;
 
     res.sendFile(dest, { root: absPath }, (err) => {
       if (err) {

@@ -195,6 +195,10 @@ body {
   background-position: top right;
 }
 
+.url__download-btn:disabled {
+  opacity: 0.5;
+}
+
 .options__option-list {
   list-style-type: none;
   margin-left: 2em;
@@ -229,7 +233,7 @@ body {
 }
 
 .options__heading h3 {
-  font-weight: 500;
+  font-weight: 300;
   color: var(--clr-neutral-700);
 }
 
@@ -242,7 +246,7 @@ body {
 .options__item label {
   padding-left: 4px;
   font-size: 2.5rem;
-  color: var(--clr-neutral-600);
+  color: var(--clr-neutral-800);
 }
 
 .options__item input[type="radio"]:checked {
@@ -372,7 +376,7 @@ input[type="checkbox"] {
   margin: 1em;
   background-color: var(--clr-primary-200);
   box-shadow: 0 0 12px -2px rgba(0, 0, 0, 0.75);
-  max-width: 350px;
+  max-width: 380px;
   max-height: 75vh;
   width: 100%;
   transition: background-color 0.25s ease;
@@ -485,8 +489,7 @@ input[type="checkbox"] {
   aspect-ratio: 1 / 1;
 }
 
-.failed .downloads__action-btn[data-dl],
-.failed .downloads__action-btn[data-cancel] {
+.failed .downloads__action-btn {
   display: none;
 }
 
