@@ -27,6 +27,8 @@ const advancedEnabler = document.querySelector("#advanced-enable");
 const advancedOptionsFieldset = document.querySelector(".downloader__fieldset.advanced");
 const advancedOptionsTrimStart = document.querySelector("#trim1");
 const advancedOptionsTrimEnd = document.querySelector("#trim2");
+const advancedVideoReencode = document.querySelector("#video-reencode");
+const advancedAudioReencode = document.querySelector("#audio-reencode");
 
 const downloadsList = document.querySelector(".downloads__list");
 const downloadsCollapseBtn = document.querySelector(".downloads__header");
@@ -84,15 +86,23 @@ const downloadManager = new DownloadManager(
 
       const advancedOptionsEnabled = advancedEnabler.checked && postprocessingCheckbox.checked;
 
-      const advancedOptions = {};
+      const advancedOptions = {
+        trim: {},
+        encoding: {},
+      };
 
       if (advancedOptionsEnabled) {
-        if (downloadManager.state.data) {
-          advancedOptions.trim = {
-            start: advancedOptionsTrimStart.valueAsNumber,
-            end: advancedOptionsTrimEnd.valueAsNumber,
-          };
+        if (downloadManager.state.data.duration !== advancedOptionsTrimEnd.valueAsNumber || advancedOptionsTrimStart.valueAsNumber !== 0) {
+          advancedOptions.trim.start = advancedOptionsTrimStart.valueAsNumber;
+          advancedOptions.trim.end = advancedOptionsTrimEnd.valueAsNumber;
         }
+      }
+
+      if (advancedVideoReencode.value !== "copy") {
+        advancedOptions.encoding.video = advancedVideoReencode.value;
+      }
+      if (advancedAudioReencode.value !== "copy") {
+        advancedOptions.encoding.audio = advancedAudioReencode.value;
       }
 
       return {
