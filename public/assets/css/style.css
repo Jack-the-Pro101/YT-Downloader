@@ -331,6 +331,11 @@ input[type="checkbox"] {
   margin-bottom: 1em;
 }
 
+.advanced__enabler {
+  display: flex;
+  align-items: center;
+}
+
 .advanced__options {
   list-style-type: none;
   margin-left: 2em;

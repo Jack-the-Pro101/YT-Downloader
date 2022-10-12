@@ -23,6 +23,7 @@ const customQualityCheckbox = document.querySelector("#custom");
 
 const containerSelect = document.querySelector("#container");
 
+const advancedEnabler = document.querySelector("#advanced-enable");
 const advancedOptionsFieldset = document.querySelector(".downloader__fieldset.advanced");
 const advancedOptionsTrimStart = document.querySelector("#trim1");
 const advancedOptionsTrimEnd = document.querySelector("#trim2");
@@ -81,11 +82,26 @@ const downloadManager = new DownloadManager(
 
       const container = containerSelect.value;
 
+      const advancedOptionsEnabled = advancedEnabler.checked && postprocessingCheckbox.checked;
+
+      const advancedOptions = {};
+
+      if (advancedOptionsEnabled) {
+        if (downloadManager.state.data) {
+          advancedOptions.trim = {
+            start: advancedOptionsTrimStart.valueAsNumber,
+            end: advancedOptionsTrimEnd.valueAsNumber,
+          };
+        }
+      }
+
       return {
         format,
         quality,
         postProcessing: postprocessingCheckbox.checked,
         container,
+        advancedOptionsEnabled,
+        advancedOptions,
       };
     },
   }
@@ -158,6 +174,11 @@ function inputSelectAllText(e) {
   e.target.select();
 }
 
+function toggleSection(e, targetSection, customCheck) {
+  if (customCheck != null && !customCheck()) return;
+  e.target.checked ? (targetSection.disabled = false) : (targetSection.disabled = true);
+}
+
 url.addEventListener("focus", inputSelectAllText);
 advancedOptionsTrimStart.addEventListener("focus", inputSelectAllText);
 advancedOptionsTrimEnd.addEventListener("focus", inputSelectAllText);
@@ -200,9 +221,9 @@ advancedOptionsTrimEnd.addEventListener("input", () => {
   advancedOptionsTrimStart.max = time;
 });
 
-postprocessingCheckbox.addEventListener("input", (e) =>
-  e.target.checked ? (advancedOptionsFieldset.disabled = false) : (advancedOptionsFieldset.disabled = true)
-);
+postprocessingCheckbox.addEventListener("input", (e) => toggleSection(e, advancedOptionsFieldset));
+
+advancedEnabler.addEventListener("input", (e) => toggleSection(e, advancedOptionsFieldset, () => postprocessingCheckbox.checked));
 
 downloadsCollapseBtn.addEventListener("click", () => {
   downloads.classList.toggle("collapsed");

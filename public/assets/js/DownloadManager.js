@@ -157,7 +157,9 @@ class DownloadManager {
       case "init":
         const { abortController } = data;
 
-        downloadItem.querySelector(".downloads__name").innerText = "Preparing download...";
+        downloadItem.querySelector(".downloads__name").innerText = !this.state.data ? "Preparing download..." : this.state.data.title;
+        downloadItem.querySelector(".downloads__name").title = !this.state.data ? "..." : this.state.data.title;
+
         downloadItem.querySelector(".downloads__item").dataset.id = downloadId;
         downloadItem.querySelector("[data-del]").addEventListener("click", () => {
           this.createOrUpdateDownloadsListItem(downloadId, "delete");
