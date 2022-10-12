@@ -24,7 +24,8 @@ class DownloadManager {
 
     url.addEventListener("input", () => {
       this.updateState("url", url.value, null, (state) => (state.previousUrl = state.url));
-      this.infoDebounce(this.state, validateURL(this.state.url) ? 250 : 0);
+      const validURL = validateURL(this.state.url);
+      this.infoDebounce(this.state, validURL ? 0 : 200, { validURL });
     });
 
     window.ws.addEventListener("message", (e) => {
@@ -32,16 +33,19 @@ class DownloadManager {
 
       switch (data.type) {
         case "begin": {
+          if (this.downloadsMap[data.id].cancelled) return;
           this.createOrUpdateDownloadsListItem(data.id, "begin", data);
 
           break;
         }
         case "progress": {
-          this.createOrUpdateDownloadsListItem(data.progress.id, "progress", data);
+          if (this.downloadsMap[data.id].cancelled) return;
+          this.createOrUpdateDownloadsListItem(data.id, "progress", data);
 
           break;
         }
         case "beginPost": {
+          if (this.downloadsMap[data.id].cancelled) return;
           this.createOrUpdateDownloadsListItem(data.id, "beginPost");
           break;
         }
@@ -68,13 +72,13 @@ class DownloadManager {
     }
   }
 
-  infoDebounce(state, debounceTime = 250) {
+  infoDebounce(state, debounceTime = 250, data) {
     if (state.infoDebounce) {
       clearTimeout(state.infoDebounce);
       state.infoDebounce = null;
     }
     state.infoDebounce = setTimeout(async () => {
-      if (!validateURL(state.url)) {
+      if (!data.validURL) {
         this.state.data = null;
       } else {
         this.state.data = await this.getInfo(state.url, true);
@@ -83,12 +87,62 @@ class DownloadManager {
     }, debounceTime);
   }
 
+  populateDownloadInfo(data) {
+    const { customVideoSelect, customAudioSelect, advancedOptionsTrimStart, advancedOptionsTrimEnd } = this.elements;
+
+    customVideoSelect.innerHTML = "";
+    customAudioSelect.innerHTML = "";
+    advancedOptionsTrimStart.max = "0";
+    advancedOptionsTrimEnd.value = "0";
+
+    if (!data) return;
+
+    advancedOptionsTrimEnd.value = data.duration;
+    advancedOptionsTrimEnd.max = data.duration;
+    advancedOptionsTrimStart.max = data.duration;
+
+    data.formats.reverse();
+
+    if (postprocessingCheckbox.checked) {
+      data.formats.forEach((format) => {
+        if (format.vcodec === "none") return;
+        const option = document.createElement("option");
+
+        option.value = format.format_id;
+        option.innerText = `${format.resolution}p ${format.video_ext} ${format.vcodec} @ ${format.fps}fps | ${formatRoundMb(
+          format.filesize || format.filesize_approx
+        )}MB | ${formatRoundKb(format.vbr)}kbps bitrate`;
+
+        option.dataset.source = format.url;
+
+        customVideoSelect.appendChild(option);
+      });
+
+      data.formats.forEach((format) => {
+        if (format.acodec === "none") return;
+        const option = document.createElement("option");
+
+        option.value = format.format_id;
+        option.innerText = `${format.asr}hz ${format.audio_ext} ${format.acodec} | ${formatRoundMb(
+          format.filesize || format.filesize_approx
+        )}MB | ${formatRoundKb(format.abr)}kbps bitrate`;
+
+        option.dataset.source = format.url;
+
+        customAudioSelect.appendChild(option);
+      });
+    } else {
+    }
+  }
+
   async getInfo(url, populate) {
     const request = await fetch("api/info?url=" + url);
     if (!request.ok) return false;
 
     try {
-      return await request.json();
+      const data = await request.json();
+      if (populate) this.populateDownloadInfo(data);
+      return data;
     } catch {
       return false;
     }
@@ -97,7 +151,7 @@ class DownloadManager {
   createOrUpdateDownloadsListItem(downloadId, state, data) {
     const { downloadsTemplate, downloadsList, downloadsItems } = this.elements;
 
-    const downloadItem = this.downloadsMap[downloadId] == null ? downloadsTemplate.content.cloneNode(true) : this.downloadsMap[downloadId];
+    const downloadItem = this.downloadsMap[downloadId] == null ? downloadsTemplate.content.cloneNode(true) : this.downloadsMap[downloadId].element;
 
     switch (state) {
       case "init":
@@ -107,12 +161,12 @@ class DownloadManager {
         downloadItem.querySelector(".downloads__item").dataset.id = downloadId;
         downloadItem.querySelector("[data-del]").addEventListener("click", () => {
           this.createOrUpdateDownloadsListItem(downloadId, "delete");
+          URL.revokeObjectURL(downloadItem.querySelector("[data-dl]").href);
         });
 
         downloadItem.querySelector("[data-cancel]").addEventListener("click", () => {
           abortController.abort();
 
-          URL.revokeObjectURL(downloadItem.querySelector("[data-dl]").href);
           this.createOrUpdateDownloadsListItem(downloadId, "cancel");
         });
 
@@ -121,7 +175,11 @@ class DownloadManager {
         for (let i = 0; i < downloadsItems.length; i++) {
           const item = downloadsItems[i];
           if (item.dataset.id === downloadId) {
-            this.downloadsMap[downloadId] = item;
+            this.downloadsMap[downloadId] = {
+              cancelled: false,
+              element: item,
+            };
+
             break;
           }
         }
@@ -145,17 +203,20 @@ class DownloadManager {
         downloadItem.classList.add("failed");
         downloadItem.classList.remove("downloading");
 
-        delete this.downloadsMap[downloadId];
-
+        setTimeout(() => {
+          this.createOrUpdateDownloadsListItem(downloadId, "delete");
+        }, 12000);
         break;
       case "cancel":
+        this.downloadsMap[downloadId].cancelled = true;
+
         downloadItem.classList.add("failed");
         downloadItem.classList.remove("downloading");
         downloadItem.querySelector(".downloads__progress-text").innerText = "CANCELLED";
 
         setTimeout(() => {
           this.createOrUpdateDownloadsListItem(downloadId, "delete");
-        }, 5000);
+        }, 7500);
         break;
 
       case "finish":
@@ -171,8 +232,8 @@ class DownloadManager {
         break;
 
       case "delete":
-        delete this.downloadsMap[downloadId];
         downloadItem.remove();
+        delete this.downloadsMap[downloadId];
         break;
 
       default:
@@ -204,13 +265,12 @@ class DownloadManager {
     const download = await fetch("download?" + urlParams.toString(), {
       method: "GET",
       signal: abortController.signal,
-    });
+    }).catch((rej) => {}); // Aborted, expected behaviour
 
-    if (!download.ok) {
+    if ((!this.downloadsMap[downloadId].cancelled && download == null) || (download != null && !download.ok)) {
       this.createOrUpdateDownloadsListItem(downloadId, "fail");
-
-      return;
     }
+    if (download == null || !download.ok) return;
 
     const blob = await download.blob();
     const downloadURL = URL.createObjectURL(blob);

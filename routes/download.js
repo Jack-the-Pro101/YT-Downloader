@@ -77,12 +77,13 @@ router.get("/", (req, res) => {
     );
   });
 
-  downloader.emitter.on("progress", (progress) => {
+  downloader.emitter.on("progress", (id, progress) => {
     if (client == null) return;
 
     client.send(
       JSON.stringify({
         type: "progress",
+        id,
         progress,
       })
     );

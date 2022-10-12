@@ -43,6 +43,10 @@ const downloadManager = new DownloadManager(
     downloadsTemplate,
     downloadsList,
     downloadsItems,
+    customVideoSelect,
+    customAudioSelect,
+    advancedOptionsTrimStart,
+    advancedOptionsTrimEnd,
   },
   {
     isCustomQuality: () => customQualityCheckbox.checked,
@@ -171,6 +175,29 @@ customAudioViewSrcBtn.addEventListener("click", (e) => {
 
   const url = customAudioSelect.options[customAudioSelect.selectedIndex].dataset.source;
   if (url) window.open(url, "_blank");
+});
+
+advancedOptionsTrimStart.addEventListener("input", () => {
+  if (!advancedOptionsTrimStart.value) {
+    advancedOptionsTrimStart.value = 0;
+  }
+  const time = advancedOptionsTrimStart.valueAsNumber;
+
+  if (time === 0) {
+    advancedOptionsTrimStart.min = 0;
+    advancedOptionsTrimEnd.max = downloadManager.state.data ? downloadManager.state.data.duration : 0;
+  } else {
+    advancedOptionsTrimEnd.min = time;
+  }
+});
+
+advancedOptionsTrimEnd.addEventListener("input", () => {
+  if (!advancedOptionsTrimEnd.value) {
+    advancedOptionsTrimEnd.value = advancedOptionsTrimEnd.max;
+  }
+  const time = advancedOptionsTrimEnd.valueAsNumber;
+
+  advancedOptionsTrimStart.max = time;
 });
 
 postprocessingCheckbox.addEventListener("input", (e) =>

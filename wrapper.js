@@ -7,7 +7,10 @@ const { spawn, spawnSync } = require("child_process");
 const { ytDlpPath } = require("./constants");
 
 const path = require("path");
+const fs = require("fs");
 const events = require("events");
+
+const serialKiller = require("tree-kill");
 
 const VideosCacheStore = require("./classes/VideosCacheStore");
 
@@ -88,7 +91,7 @@ exports.download = (url, info, downloadId) => {
     "--print",
     "post_process:>+",
     "--progress-template",
-    "-%(progress.status)s,%(progress._total_bytes_str)s,%(progress._percent_str)s,%(progress._speed_str)s,%(progress._eta_str)s",
+    "-%(progress.status)s,%(progress._total_bytes_str)s,%(progress._percent_str)s,%(progress._speed_str)s,%(progress._eta_str)s,%(progress.tmpfilename)s,%(progress.filename)s",
   ];
   const emitter = new events.EventEmitter();
 
@@ -178,10 +181,35 @@ exports.download = (url, info, downloadId) => {
   console.log("Recieved download request...");
   const worker = interact(url, args);
 
-  const partialData = {};
+  const partialData = {
+    status: sharedConstants.DOWNLOAD_STATUSES.PREPARING,
+    tempFiles: [],
+    rawFiles: [],
+  };
 
-  const cancel = () => {
-    return worker.kill(2);
+  const cancel = (status) => {
+    serialKiller(worker.pid, (err) => {
+      switch (status) {
+        case sharedConstants.DOWNLOAD_STATUSES.DOWNLOADING:
+          partialData.tempFiles.forEach((file) => {
+            if (!fs.existsSync(file)) return;
+            fs.unlinkSync(file);
+          });
+
+          break;
+        case sharedConstants.DOWNLOAD_STATUSES.PROCESSING:
+          partialData.rawFiles.forEach((file) => {
+            if (!fs.existsSync(file)) return;
+            fs.unlinkSync(file);
+          });
+          break;
+
+        default:
+          break;
+      }
+
+      return err;
+    });
   };
 
   worker.stdout.on("data", (data) => {
@@ -199,10 +227,12 @@ exports.download = (url, info, downloadId) => {
       const percent = data[2];
       const speed = data[3];
       const eta = data[4];
+      const tmpFilename = data[5];
+
+      partialData.tempFiles.push(tmpFilename);
 
       if (status === "downloading") {
-        emitter.emit("progress", {
-          id: downloadId,
+        emitter.emit("progress", downloadId, {
           status,
           totalSize,
           percent,
@@ -211,10 +241,13 @@ exports.download = (url, info, downloadId) => {
         });
       }
     } else if (text.startsWith(">+")) {
+      partialData.status = sharedConstants.DOWNLOAD_STATUSES.PROCESSING;
       emitter.emit("post", downloadId);
     } else if (text.startsWith("=")) {
+      partialData.status = sharedConstants.DOWNLOAD_STATUSES.DONE;
       emitter.emit("finish", path.basename(text.slice(1)).trim(), downloadId);
     } else if (text.startsWith("<")) {
+      partialData.status = sharedConstants.DOWNLOAD_STATUSES.DOWNLOADING;
       emitter.emit("begin", { id: downloadId, title: text.slice(1) });
     }
   });
@@ -227,6 +260,6 @@ exports.download = (url, info, downloadId) => {
 
   return {
     emitter,
-    cancel,
+    cancel: () => cancel(partialData.status),
   };
 };

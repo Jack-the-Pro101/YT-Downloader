@@ -13,6 +13,13 @@ const AUDIO_CONTAINERS = ["mp3", "m4a", "wav", "ogg", "opus", "aac", "alac", "fl
 
 const VIDEO_CONTAINERS = ["mp4", "webm", "avi", "mov", "mkv", "flv"];
 
+const DOWNLOAD_STATUSES = {
+  PREPARING: 0,
+  DOWNLOADING: 1,
+  PROCESSING: 2,
+  DONE: 3,
+};
+
 /**
  * Get video ID.
  *
@@ -101,6 +108,7 @@ if (typeof window === "undefined") {
     QUALITIES,
     AUDIO_CONTAINERS,
     VIDEO_CONTAINERS,
+    DOWNLOAD_STATUSES,
     validateID,
     validateURL,
     getVideoID,
