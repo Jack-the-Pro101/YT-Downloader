@@ -250,6 +250,10 @@ class DownloadManager {
   }
 
   async download() {
+    if (!window.ws.alive) {
+      return alert("Websocket not connected!\nPlease wait a few seconds for reconnection before downloading...");
+    }
+
     const { getDownloadInfo } = this.functions;
 
     const payload = getDownloadInfo();

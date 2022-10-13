@@ -208,6 +208,7 @@ exports.download = (url, info, downloadId) => {
           break;
       }
 
+      emitter.removeAllListeners();
       return err;
     });
   };

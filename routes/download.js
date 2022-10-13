@@ -9,6 +9,7 @@ const { getWsClient, ffmpegPath } = require("../utils");
 const { validateURL, getVideoID } = require("../public/shared/shared");
 const { download } = require("../wrapper");
 
+const serialKiller = require("tree-kill");
 const { validate: validateUUID } = require("uuid");
 
 router.get("/", (req, res) => {
@@ -22,11 +23,34 @@ router.get("/", (req, res) => {
   if (!validateUUID(downloadId)) return res.sendStatus(400);
 
   const downloader = download(url, info, downloadId);
-  let done = false;
+
+  const status = {
+    downloadDone: false,
+    postProccessDone: false,
+    processingCancelled: false,
+    workingFilePath: null,
+    worker: null,
+  };
 
   res.once("close", () => {
-    if (!done) {
+    if (!status.done) {
       const killed = downloader.cancel();
+      console.log(killed);
+    }
+    if (info.advancedOptionsEnabled && !status.postProccessDone && status.worker != null) {
+      status.processingCancelled = true;
+      const killed = serialKiller(status.worker.pid, (err) => {
+        if (err) {
+          return err;
+        } else {
+          if (fs.existsSync(status.workingFilePath)) {
+            setTimeout(() => {
+              fs.unlinkSync(status.workingFilePath);
+            }, 2000);
+          }
+        }
+      });
+
       console.log(killed);
     }
   });
@@ -107,6 +131,7 @@ router.get("/", (req, res) => {
         const args = [];
 
         const processedFile = path.parse(dest).name + " [processed]." + info.container;
+        status.workingFilePath = path.join(absPath, processedFile);
 
         if (Object.keys(info.advancedOptions.trim).length !== 0) {
           if (
@@ -120,8 +145,8 @@ router.get("/", (req, res) => {
           if (info.advancedOptions.trim.end) args.push("-t", info.advancedOptions.trim.end);
         }
 
-        args.push("-c:v", info.advancedOptions.encoding.video);
-        args.push("-c:a", info.advancedOptions.encoding.audio);
+        args.push("-c:v", info.advancedOptions.encoding.video ?? "copy");
+        args.push("-c:a", info.advancedOptions.encoding.audio ?? "copy");
 
         const worker = spawn(ffmpegPath, ["-i", absFilePath, "-y", ...args, processedFile], {
           cwd: absPath,
@@ -139,12 +164,20 @@ router.get("/", (req, res) => {
         worker.on("close", (code) => {
           if (code === 0) {
             resolve(processedFile);
+            postProccessDone = true;
           } else {
             reject(code);
           }
         });
+
+        status.worker = worker;
+      }).catch((err) => {
+        if (status.processingCancelled) return;
+        console.log(err);
       });
     }
+
+    if (status.processingCancelled) return;
 
     res.header("Filename", dest);
     res.header("Id", id);
