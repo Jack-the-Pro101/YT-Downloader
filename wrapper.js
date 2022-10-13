@@ -1,6 +1,6 @@
 const { validateURL, getURLVideoID } = require("./public/shared/shared");
 
-const { getFfmpegPath } = require("./utils");
+const { ffmpegPath } = require("./utils");
 
 const { spawn, spawnSync } = require("child_process");
 
@@ -28,7 +28,7 @@ const interact = (url, args = []) => {
     "--output",
     path.join(process.cwd(), "/tmp/") + "%(title)s.%(ext)s",
     "--ffmpeg-location",
-    getFfmpegPath(),
+    ffmpegPath,
     "--restrict-filenames",
     url,
   ]);

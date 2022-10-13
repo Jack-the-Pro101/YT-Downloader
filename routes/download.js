@@ -3,9 +3,10 @@ const router = express.Router();
 
 const fs = require("fs");
 const path = require("path");
+const { spawn } = require("child_process");
 
-const { getWsClient } = require("../utils");
-const { validateURL } = require("../public/shared/shared");
+const { getWsClient, ffmpegPath } = require("../utils");
+const { validateURL, getVideoID } = require("../public/shared/shared");
 const { download } = require("../wrapper");
 
 const { validate: validateUUID } = require("uuid");
@@ -93,22 +94,66 @@ router.get("/", (req, res) => {
     res.status(500).send(id);
   });
 
-  downloader.emitter.once("finish", (dest, id) => {
+  downloader.emitter.once("finish", async (dest, id) => {
     done = true;
 
-    res.header("Filename", dest);
-    res.header("Id", id);
-
     const absPath = path.join(process.cwd(), "./tmp");
+    const absFilePath = path.join(absPath, dest);
 
     if (res.closed) return;
 
+    if (info.advancedOptionsEnabled) {
+      dest = await new Promise((resolve, reject) => {
+        const args = [];
+
+        const processedFile = path.parse(dest).name + " [processed]." + info.container;
+
+        if (Object.keys(info.advancedOptions.trim).length !== 0) {
+          if (
+            info.advancedOptions.trim.start > info.advancedOptions.trim.end ||
+            info.advancedOptions.trim.end < info.advancedOptions.trim.start ||
+            info.advancedOptions.trim.start < 0
+          )
+            return res.sendStatus(400); // Needs one more check on end length
+
+          if (info.advancedOptions.trim.start) args.push("-ss", info.advancedOptions.trim.start);
+          if (info.advancedOptions.trim.end) args.push("-t", info.advancedOptions.trim.end);
+        }
+
+        args.push("-c:v", info.advancedOptions.encoding.video);
+        args.push("-c:a", info.advancedOptions.encoding.audio);
+
+        const worker = spawn(ffmpegPath, ["-i", absFilePath, "-y", ...args, processedFile], {
+          cwd: absPath,
+        });
+        worker.stdout.setEncoding("utf8");
+        worker.stderr.setEncoding("utf8");
+
+        worker.stdout.on("data", (data) => {
+          console.log(data.toString());
+        });
+        worker.stderr.on("data", (data) => {
+          console.log(data.toString());
+        });
+
+        worker.on("close", (code) => {
+          if (code === 0) {
+            resolve(processedFile);
+          } else {
+            reject(code);
+          }
+        });
+      });
+    }
+
+    res.header("Filename", dest);
+    res.header("Id", id);
     res.sendFile(dest, { root: absPath }, (err) => {
       if (err) {
         console.error(err);
       } else {
         if (process.env.NODE_ENV === "production") {
-          fs.unlinkSync(path.join(absPath, dest));
+          fs.unlinkSync(absFilePath);
         }
       }
     });
