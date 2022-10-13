@@ -6,10 +6,6 @@ exports.getWsClient = (id) => {
 
 const ffmpegStatic = require("ffmpeg-static");
 
-exports.getFfmpegPath = () => {
-  if (process.env.NODE_ENV === "production") {
-    return process.env.BINARY_PATH;
-  } else {
-    return ffmpegStatic;
-  }
-};
+const ffmpegPath = process.env.NODE_ENV === "production" ? process.env.BINARY_PATH : ffmpegStatic;
+
+exports.ffmpegPath = ffmpegPath;
