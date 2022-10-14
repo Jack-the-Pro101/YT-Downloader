@@ -231,7 +231,7 @@ advancedOptionsTrimEnd.addEventListener("input", () => {
   advancedOptionsTrimStart.max = time;
 });
 
-postprocessingCheckbox.addEventListener("input", (e) => toggleSection(e, advancedOptionsFieldset));
+postprocessingCheckbox.addEventListener("input", (e) => toggleSection(e, advancedOptionsFieldset, () => advancedEnabler.checked));
 
 advancedEnabler.addEventListener("input", (e) => toggleSection(e, advancedOptionsFieldset, () => postprocessingCheckbox.checked));
 

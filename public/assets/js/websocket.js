@@ -29,7 +29,7 @@
   };
 
   function disconnected() {
-    window.ws.socket.close();
+    window.ws.alive = false;
 
     connect();
   }

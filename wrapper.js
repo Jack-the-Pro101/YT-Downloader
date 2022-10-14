@@ -95,25 +95,29 @@ exports.download = (url, info, downloadId) => {
   ];
   const emitter = new events.EventEmitter();
 
+  const reEncode = Object.keys(info.advancedOptions.encoding).length > 0;
   if (info.quality.custom) {
     switch (info.format) {
       case sharedConstants.FORMATS.AUDIO:
         if (info.postProcessing) {
-          args.push("--format", info.quality.value.audio, "--extract-audio", "--audio-format", info.container);
+          args.push("--format", info.quality.value.audio, "--extract-audio");
+          if (!reEncode) args.push("--audio-format", info.container);
         } else {
           args.push("--format", `${info.quality.value.audio}`);
         }
         break;
       case sharedConstants.FORMATS.VIDEO:
         if (info.postProcessing) {
-          args.push("--format", info.quality.value.video, "--remux-video", info.container);
+          args.push("--format", info.quality.value.video);
+          if (!reEncode) args.push("--remux-video", info.container);
         } else {
           args.push("--format", info.quality.value.video);
         }
         break;
       case sharedConstants.FORMATS.VIDEOAUDIO:
         if (info.postProcessing) {
-          args.push("--format", `${info.quality.value.video}+${info.quality.value.audio}`, "--merge-output-format", info.container);
+          args.push("--format", `${info.quality.value.video}+${info.quality.value.audio}`);
+          if (!reEncode) args.push("--merge-output-format", info.container);
         } else {
           args.push("--format", `${info.quality.value.video}+${info.quality.value.audio}`);
         }
@@ -127,13 +131,15 @@ exports.download = (url, info, downloadId) => {
       case sharedConstants.FORMATS.AUDIO:
         if (info.quality.value === sharedConstants.QUALITIES.HIGHEST) {
           if (info.postProcessing) {
-            args.push("--format", "bestaudio", "--extract-audio", "--audio-format", info.container);
+            args.push("--format", "bestaudio", "--extract-audio");
+            if (!reEncode) args.push("--audio-format", info.container);
           } else {
             args.push("--format", "bestaudio");
           }
         } else {
           if (info.postProcessing) {
-            args.push("--format", "worstaudio", "--audio-format", info.container);
+            args.push("--format", "worstaudio");
+            if (!reEncode) args.push("--audio-format", info.container);
           } else {
             args.push("--format", "worstaudio");
           }
@@ -144,12 +150,14 @@ exports.download = (url, info, downloadId) => {
         if (info.quality.value === sharedConstants.QUALITIES.HIGHEST) {
           if (info.postProcessing) {
             args.push("--format", "bestvideo", "--remux-video", info.container);
+            if (!reEncode) args.push("--remux-video", info.container);
           } else {
             args.push("--format", "bestvideo");
           }
         } else {
           if (info.postProcessing) {
-            args.push("--format", "worstaudio", "--remux-video", info.container);
+            args.push("--format", "worstaudio");
+            if (!reEncode) args.push("--remux-video", info.container);
           } else {
             args.push("--format", "worstaudio");
           }
@@ -159,13 +167,15 @@ exports.download = (url, info, downloadId) => {
       case sharedConstants.FORMATS.VIDEOAUDIO:
         if (info.quality.value === sharedConstants.QUALITIES.HIGHEST) {
           if (info.postProcessing) {
-            args.push("--format", "bestvideo+bestaudio", "--merge-output-format", info.container);
+            args.push("--format", "bestvideo+bestaudio");
+            if (!reEncode) args.push("--merge-output-format", info.container);
           } else {
             args.push("--format", "bestvideo+bestaudio");
           }
         } else {
           if (info.postProcessing) {
-            args.push("--format", "worstvideo+worstaudio", "--merge-output-format", info.container);
+            args.push("--format", "worstvideo+worstaudio");
+            if (!reEncode) args.push("--merge-output-format", info.container);
           } else {
             args.push("--format", "worstvideo+worstaudio");
           }

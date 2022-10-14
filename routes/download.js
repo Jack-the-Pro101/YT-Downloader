@@ -6,7 +6,7 @@ const path = require("path");
 const { spawn } = require("child_process");
 
 const { getWsClient, ffmpegPath } = require("../utils");
-const { validateURL, getVideoID } = require("../public/shared/shared");
+const { validateURL, FORMATS } = require("../public/shared/shared");
 const { download } = require("../wrapper");
 
 const serialKiller = require("tree-kill");
@@ -142,11 +142,11 @@ router.get("/", (req, res) => {
             return res.sendStatus(400); // Needs one more check on end length
 
           if (info.advancedOptions.trim.start) args.push("-ss", info.advancedOptions.trim.start);
-          if (info.advancedOptions.trim.end) args.push("-t", info.advancedOptions.trim.end);
+          if (info.advancedOptions.trim.end) args.push("-t", info.advancedOptions.trim.end - info.advancedOptions.trim.start);
         }
 
-        args.push("-c:v", info.advancedOptions.encoding.video ?? "copy");
-        args.push("-c:a", info.advancedOptions.encoding.audio ?? "copy");
+        if (info.format === FORMATS.VIDEO || info.format === FORMATS.VIDEOAUDIO) args.push("-c:v", info.advancedOptions.encoding.video ?? "copy");
+        if (info.format === FORMATS.AUDIO || info.format === FORMATS.VIDEOAUDIO) args.push("-c:a", info.advancedOptions.encoding.audio ?? "copy");
 
         const worker = spawn(ffmpegPath, ["-i", absFilePath, "-y", ...args, processedFile], {
           cwd: absPath,
@@ -172,12 +172,14 @@ router.get("/", (req, res) => {
 
         status.worker = worker;
       }).catch((err) => {
-        if (status.processingCancelled) return;
+        if (status.processingCancelled) return false;
         console.log(err);
       });
+
+      if (!dest) return res.sendStatus(500);
     }
 
-    if (status.processingCancelled) return;
+    if (status.processingCancelled) return res.sendStatus(500);
 
     res.header("Filename", dest);
     res.header("Id", id);
