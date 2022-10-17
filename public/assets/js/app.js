@@ -96,13 +96,12 @@ const downloadManager = new DownloadManager(
           advancedOptions.trim.start = advancedOptionsTrimStart.valueAsNumber;
           advancedOptions.trim.end = advancedOptionsTrimEnd.valueAsNumber;
         }
-      }
-
-      if (advancedVideoReencode.value !== "copy") {
-        advancedOptions.encoding.video = advancedVideoReencode.value;
-      }
-      if (advancedAudioReencode.value !== "copy") {
-        advancedOptions.encoding.audio = advancedAudioReencode.value;
+        if (advancedVideoReencode.value !== "copy") {
+          advancedOptions.encoding.video = advancedVideoReencode.value;
+        }
+        if (advancedAudioReencode.value !== "copy") {
+          advancedOptions.encoding.audio = advancedAudioReencode.value;
+        }
       }
 
       return {
