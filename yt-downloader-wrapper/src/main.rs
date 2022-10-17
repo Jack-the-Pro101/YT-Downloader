@@ -10,10 +10,11 @@ fn main() {
     let dir = temp_dir();
     let temp_dir = dir.to_str().expect("Failed to get dir");
     let ffmpeg = include_bytes!("ffmpeg.7z");
-    let ffmpeg_path = Path::new(temp_dir);
+    let ffmpeg_path = Path::new(temp_dir).join("ffmpeg.exe");
     if !ffmpeg_path.exists() {
         println!("[bootstrap] Extracting ffmpeg");
-        let ffmpeg_decompress = sevenz_rust::decompress(Cursor::new(ffmpeg), ffmpeg_path);
+        let ffmpeg_decompress =
+            sevenz_rust::decompress(Cursor::new(ffmpeg), ffmpeg_path.parent().unwrap());
         if ffmpeg_decompress.is_err() {
             println!("Error: {}", ffmpeg_decompress.err().unwrap());
             panic!("Failed to extract ffmpeg");
