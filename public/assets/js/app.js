@@ -5,6 +5,9 @@ const form = document.querySelector(".downloader__form");
 const controlPanel = document.querySelector(".control-panel");
 const controlPanelToggleBtn = document.querySelector(".control-panel__toggle");
 
+const websocketPing = document.querySelector(".status__ping");
+const websocketStatus = document.querySelector(".status__status");
+
 const url = document.querySelector("#url");
 const downloadBtn = document.querySelector(".url__download-btn");
 
@@ -154,6 +157,18 @@ function handleFormatChange(e) {
     }
   }
 }
+
+function updateWsStatus() {
+  websocketPing.querySelector("[data-ping]").innerText = window.ws.ping;
+
+  if (window.ws.alive) {
+    websocketStatus.innerText = "Connected";
+  } else {
+    websocketStatus.innerText = "Reconnecting...";
+  }
+}
+const updateWsPing = setInterval(updateWsStatus, 2000);
+updateWsStatus();
 
 controlPanelToggleBtn.addEventListener("click", () => {
   controlPanel.classList.toggle("active");

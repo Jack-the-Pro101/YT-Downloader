@@ -64,7 +64,7 @@
       window.ws.alive = true;
     });
 
-    window.ws.socket.onopen = () => {
+    window.ws.socket.addEventListener("open", () => {
       if (window.ws.socket.OPEN) {
         console.log("Socket opened");
 
@@ -76,7 +76,7 @@
           window.ws.socket.addEventListener(listener.type, listener.callback);
         });
       }
-    };
+    });
   }
 
   connect();
