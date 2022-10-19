@@ -7,6 +7,11 @@ const ytDlpPath = () => {
   }
 };
 
+const ffmpegStatic = require("ffmpeg-static");
+
+const ffmpegPath = process.env.NODE_ENV === "production" ? process.env.BINARY_PATH : ffmpegStatic;
+
 module.exports = {
   ytDlpPath,
+  ffmpegPath,
 };

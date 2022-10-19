@@ -5,7 +5,8 @@ const fs = require("fs");
 const path = require("path");
 const { spawn } = require("child_process");
 
-const { getWsClient, ffmpegPath } = require("../utils");
+const { getWsClient } = require("../utils");
+const { ffmpegPath } = require("../constants");
 const { validateURL, FORMATS } = require("../public/shared/shared");
 const { download } = require("../wrapper");
 
@@ -55,7 +56,7 @@ router.get("/", (req, res) => {
     }
   });
 
-  const client = getWsClient(req.cookies["YTDL_CLIENT_ID"]);
+  const client = getWsClient(req.cookies["YTDL_SESSION_ID"]);
 
   downloader.emitter.once("begin", ({ id, title }) => {
     if (client == null) return;
@@ -163,8 +164,8 @@ router.get("/", (req, res) => {
 
         worker.on("close", (code) => {
           if (code === 0) {
-            resolve(processedFile);
             postProccessDone = true;
+            resolve(processedFile);
           } else {
             reject(code);
           }
@@ -181,7 +182,8 @@ router.get("/", (req, res) => {
 
     if (status.processingCancelled) return res.sendStatus(500);
 
-    res.header("Filename", dest);
+    res.header("Filename", dest.slice(0, dest.length - (36 + 1 + path.extname(dest).length) + (info.advancedOptionsEnabled ? " [processed]".length : 0))) +
+      path.extname(dest); // 36 is UUID length, + 1 is length of extra hyphen
     res.header("Id", id);
     res.sendFile(dest, { root: absPath }, (err) => {
       if (err) {

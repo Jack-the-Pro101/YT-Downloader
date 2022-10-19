@@ -24,6 +24,8 @@ const { spawn } = require("child_process");
 
   const app = express();
 
+  app.use(express.static(path.join(__dirname, "./public")));
+
   const expressWs = require("express-ws")(app);
   global.websocket = expressWs;
   expressWs.getWss().on("error", (err) => {
@@ -34,12 +36,13 @@ const { spawn } = require("child_process");
   app.use(express.urlencoded({ extended: false }));
   app.set("view engine", "ejs");
   app.use(cookieParser());
-  app.use(express.static(path.join(__dirname, "./public")));
 
   app.use((req, res, next) => {
+    if (req.url.length !== 1 || req.url !== "/") return next();
     if (req.cookies["YTDL_CLIENT_ID"] == null) {
       res.cookie("YTDL_CLIENT_ID", uuid(), { path: "/" });
     }
+    res.cookie("YTDL_SESSION_ID", uuid(), { path: "/" });
     next();
   });
 

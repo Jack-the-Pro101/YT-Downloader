@@ -18,9 +18,9 @@
   --clr-accent2: #f9f871;
   --clr-light: #e4efff;
 
-  --clr-neutral-100: hsl(244, 25%, 10%);
-  --clr-neutral-200: hsl(244, 10%, 20%);
-  --clr-neutral-300: hsl(244, 10%, 30%);
+  --clr-neutral-100: hsl(227, 39%, 9%);
+  --clr-neutral-200: hsl(233, 18%, 19%);
+  --clr-neutral-300: hsl(231, 18%, 28%);
   --clr-neutral-400: hsl(244, 10%, 40%);
   --clr-neutral-500: hsl(244, 10%, 50%);
   --clr-neutral-600: hsl(244, 10%, 60%);
@@ -112,6 +112,64 @@ body {
 .header__subtitle {
   text-align: center;
   font-size: 2.5rem;
+}
+
+.control-panel {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  padding: 1em;
+  width: 90%;
+  box-shadow: 0 0 0px 0px rgba(0, 0, 0, 0.75);
+  max-width: 24em;
+  transform: translateX(-100%);
+  background-color: var(--clr-neutral-100);
+  transition: transform 0.35s ease, opacity 0.25s ease;
+}
+
+.control-panel.active {
+  transform: translateX(0%);
+  box-shadow: 0 0 24px -2px rgba(0, 0, 0, 0.75);
+}
+
+.control-panel__list {
+  display: flex;
+  flex-direction: column;
+  list-style-type: none;
+}
+
+.control-panel__toggle {
+  position: absolute;
+  right: 0;
+  top: 2rem;
+  transform: translateX(100%);
+  padding: 0.25em 0.5em;
+  padding-right: 0.75em;
+  font-size: 3rem;
+  background-color: var(--clr-primary-400);
+  color: var(--clr-neutral-900);
+  border: none;
+  border-radius: 0px 100vmax 100vmax 0px;
+}
+
+.control-panel__toggle:hover {
+  cursor: pointer;
+  background-color: var(--clr-primary-500);
+}
+
+.control-panel__toggle i {
+  transition: transform 0.3s ease;
+  transform: rotate(90deg);
+}
+
+.active .control-panel__toggle i {
+  transform: rotate(270deg);
+}
+
+.control-panel__title {
+  text-align: center;
+  margin-bottom: 1em;
 }
 
 .downloader {
@@ -381,9 +439,9 @@ input[type="checkbox"] {
   margin: 1em;
   background-color: var(--clr-primary-200);
   box-shadow: 0 0 12px -2px rgba(0, 0, 0, 0.75);
-  max-width: 380px;
+  max-width: 24em;
   max-height: 24em;
-  width: 100%;
+  width: calc(100% - 2em);
   transition: background-color 0.25s ease;
 }
 

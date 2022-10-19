@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const { getInfo } = require("../wrapper");
+const { getWsClients } = require("../utils");
 
 router.get("/info", async (req, res) => {
   const url = req.query.url;
@@ -14,7 +15,11 @@ router.get("/info", async (req, res) => {
 });
 
 router.ws("/ws", async (ws, req) => {
-  ws.id = req.cookies["YTDL_CLIENT_ID"];
+  const socketId = req.cookies["YTDL_SESSION_ID"];
+
+  if (getWsClients().some((value) => value.id === socketId)) return ws.terminate();
+
+  ws.id = socketId;
 
   ws.on("message", (data) => {
     try {

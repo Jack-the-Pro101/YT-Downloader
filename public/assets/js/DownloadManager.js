@@ -162,8 +162,8 @@ class DownloadManager {
 
         downloadItem.querySelector(".downloads__item").dataset.id = downloadId;
         downloadItem.querySelector("[data-del]").addEventListener("click", () => {
+          URL.revokeObjectURL(this.downloadsMap[downloadId].element.href);
           this.createOrUpdateDownloadsListItem(downloadId, "delete");
-          URL.revokeObjectURL(downloadItem.querySelector("[data-dl]").href);
         });
 
         downloadItem.querySelector("[data-cancel]").addEventListener("click", () => {
@@ -234,8 +234,8 @@ class DownloadManager {
         break;
 
       case "delete":
-        downloadItem.remove();
         delete this.downloadsMap[downloadId];
+        downloadItem.remove();
         break;
 
       default:

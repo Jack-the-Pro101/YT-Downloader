@@ -1,10 +1,8 @@
 const { validateURL, getURLVideoID } = require("./public/shared/shared");
 
-const { ffmpegPath } = require("./utils");
-
 const { spawn, spawnSync } = require("child_process");
 
-const { ytDlpPath } = require("./constants");
+const { ytDlpPath, ffmpegPath } = require("./constants");
 
 const path = require("path");
 const fs = require("fs");
@@ -22,11 +20,11 @@ const interactSync = (url, args = []) => {
   });
 };
 
-const interact = (url, args = []) => {
+const interact = (url, downloadId, args = []) => {
   const child = spawn(ytDlpPath(), [
     ...args,
     "--output",
-    path.join(process.cwd(), "/tmp/") + "%(title)s.%(ext)s",
+    path.join(process.cwd(), "/tmp/") + "%(title)s" + `-${downloadId}` + ".%(ext)s",
     "--ffmpeg-location",
     ffmpegPath,
     "--restrict-filenames",
@@ -189,7 +187,7 @@ exports.download = (url, info, downloadId) => {
   }
 
   console.log("Recieved download request...");
-  const worker = interact(url, args);
+  const worker = interact(url, downloadId, args);
 
   const partialData = {
     status: sharedConstants.DOWNLOAD_STATUSES.PREPARING,

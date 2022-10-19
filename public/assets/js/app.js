@@ -2,6 +2,9 @@
 
 const form = document.querySelector(".downloader__form");
 
+const controlPanel = document.querySelector(".control-panel");
+const controlPanelToggleBtn = document.querySelector(".control-panel__toggle");
+
 const url = document.querySelector("#url");
 const downloadBtn = document.querySelector(".url__download-btn");
 
@@ -151,6 +154,10 @@ function handleFormatChange(e) {
     }
   }
 }
+
+controlPanelToggleBtn.addEventListener("click", () => {
+  controlPanel.classList.toggle("active");
+});
 
 formatVideoRadio.addEventListener("input", handleFormatChange);
 formatAudioRadio.addEventListener("input", handleFormatChange);
