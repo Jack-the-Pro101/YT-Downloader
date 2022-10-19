@@ -16,9 +16,6 @@ const { spawn } = require("child_process");
 (async function () {
   console.time("Start");
 
-  // const test = spawn(path.join(__dirname, "/node_modules/ffmpeg-static/ffmpeg.exe"), ["-version"]);
-  // test.stdout.on("data", (data) => console.log(data.toString("utf8")));
-
   console.log(chalk.green("\nStarting YouTube downloader..."));
   console.log(chalk.green("Starting webpage UI..."));
 

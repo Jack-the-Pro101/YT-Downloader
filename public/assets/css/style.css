@@ -255,6 +255,7 @@ body {
 
 .url__download-btn:disabled {
   opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .options__option-list {
@@ -299,6 +300,7 @@ body {
   width: 3rem;
   height: 3rem;
   opacity: 0.7;
+  accent-color: var(--clr-primary-500);
 }
 
 .options__item label {
@@ -359,6 +361,7 @@ body {
 
 input[type="checkbox"] {
   margin-left: 0.75em;
+  accent-color: var(--clr-primary-500);
 }
 
 select {

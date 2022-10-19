@@ -40,17 +40,36 @@
       <h2 class="control-panel__title">Control Panel</h2>
 
       <ul class="control-panel__list">
-        <li class="control-panel__item">
-          <h3 class="control-panel__heading">Host System Specs.</h3>
+        <li class="control-panel__item specs">
+          <h3 class="control-panel__heading">Host System Specifications</h3>
+
+          <ul class="specs__list">
+            <li class="specs__item">
+              <h4 class="specs__heading">CPU</h4>
+              <p class="specs__info"><%- locals.sysInfo.cpu %></p>
+            </li>
+            <li class="specs__item">
+              <h4 class="specs__heading">Memory</h4>
+              <p class="specs__info"><%- locals.sysInfo.totalMem %> GB</p>
+            </li>
+            <li class="specs__item">
+              <h4 class="specs__heading">OS</h4>
+              <p class="specs__info"><%- locals.sysInfo.os %></p>
+            </li>
+            <li class="specs__item">
+              <h4 class="specs__heading">GPUs</h4>
+              <p class="specs__info"><%- locals.sysInfo.gpus.replace(/\n/g, "<br />") %></p>
+            </li>
+          </ul>
         </li>
         <li class="control-panel__item">
-          <h3 class="control-panel__heading">Host System Specs.</h3>
+          <h3 class="control-panel__heading">Status Monitor</h3>
         </li>
         <li class="control-panel__item">
-          <h3 class="control-panel__heading">Host System Specs.</h3>
+          <h3 class="control-panel__heading">Lorem Ipsum</h3>
         </li>
         <li class="control-panel__item">
-          <h3 class="control-panel__heading">Host System Specs.</h3>
+          <h3 class="control-panel__heading">Actions</h3>
         </li>
       </ul>
     </aside>
@@ -106,7 +125,7 @@
                   <label for="container">Type</label>
                   <select name="container" id="container">
                     <!-- Options are populated through JS -->
-                    <% locals.AUDIO_CONTAINERS.forEach(container => { %> <%- `
+                    <% locals.shared.AUDIO_CONTAINERS.forEach(container => { %> <%- `
                     <option value="${container}" class="container__option">${container}</option>
                     ` %> <% }) %>
                   </select>
