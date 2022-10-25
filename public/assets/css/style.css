@@ -251,7 +251,7 @@ body {
   color: var(--clr-neutral-900);
   width: 100%;
   height: 100%;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .actions__btn:hover {
@@ -262,6 +262,10 @@ body {
 .actions__btn:active {
   transition: background-color 0s linear;
   background-color: var(--clr-primary-300);
+}
+
+.actions__btn[data-power]:hover {
+  color: red;
 }
 
 .downloader {
