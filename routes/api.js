@@ -14,6 +14,13 @@ router.get("/info", async (req, res) => {
   res.json(data);
 });
 
+router.delete("/server", (req, res) => {
+  // TODO: Refactor downloader code into class to allow for download cancelling
+
+  res.sendStatus(202);
+  process.exit(0); // Adios amigos
+});
+
 router.ws("/ws", async (ws, req) => {
   const socketId = req.cookies["YTDL_SESSION_ID"];
 

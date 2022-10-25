@@ -259,3 +259,21 @@ advancedEnabler.addEventListener("input", (e) => toggleSection(e, advancedOption
 downloadsCollapseBtn.addEventListener("click", () => {
   downloads.classList.toggle("collapsed");
 });
+
+// Control panel buttons
+
+const controlPanelActionsList = document.querySelector(".actions__list");
+
+controlPanelActionsList.querySelector("[data-power]").addEventListener("click", async () => {
+  const req = await fetch("api/server", {
+    method: "DELETE",
+  });
+
+  if (req.ok) {
+    document.querySelector(
+      "body"
+    ).innerHTML = `<div class="farewell"><h1 class="farewell__title">Process exited successfully.<br/>You may now close this window.</h1></div>`;
+  } else {
+    alert(`Failure to power off, status ${req.status}:\n${req.statusText}`);
+  }
+});
