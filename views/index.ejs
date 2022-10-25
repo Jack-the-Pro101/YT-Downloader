@@ -32,7 +32,7 @@
       <h1 class="header__title">YouTube Downloader</h1>
       <p class="header__subtitle">V 2.0.0</p>
     </header>
-    <aside class="control-panel active">
+    <aside class="control-panel">
       <button class="control-panel__toggle" title="Toggle control panel">
         <i class="fa-solid fa-caret-up"></i>
       </button>
@@ -67,7 +67,7 @@
 
           <div class="status">
             <h4 class="status__heading">Websocket</h4>
-            <p class="status__ping"><span data-ping>N/A</span>ms</p>
+            <p class="status__ping">Ping: <span data-ping>N/A</span>ms</p>
             <p class="status__status">Not connected</p>
           </div>
         </li>
@@ -215,8 +215,12 @@
                 <label for="custom-codec-check">Custom</label>
                 <input type="checkbox" name="custom-codec-check" id="custom-codec-check" />
 
-                <label for="custom-codec">Codec</label>
-                <input type="text" name="custom-codec" id="custom-codec" maxlength="12" />
+                <div class="advanced__option-custom-codec">
+                  <label for="custom-codec-video">Video Codec</label>
+                  <input type="text" name="custom-codec-video" id="custom-codec-video" maxlength="12" disabled />
+                  <label for="custom-codec-audio">Audio Codec</label>
+                  <input type="text" name="custom-codec-audio" id="custom-codec-audio" maxlength="12" disabled />
+                </div>
               </div>
             </li>
           </ul>
@@ -276,9 +280,9 @@
     <footer class="footer">
       <p class="footer__credits">Made by Emperor of Bluegaria (Jack H.)</p>
       <ul class="footer__contacts">
-        <li class="footer__contacts-item">Emperor of Bluegaria#3725</li>
+        <li class="footer__contacts-item"><i class="fa-brands fa-discord"></i> Emperor of Bluegaria#3725</li>
         <li class="footer__contacts-item">
-          <a href="https://github.com/Jack-the-Pro101" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="https://github.com/Jack-the-Pro101" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> GitHub</a>
         </li>
       </ul>
     </footer>

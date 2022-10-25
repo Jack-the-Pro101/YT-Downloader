@@ -58,7 +58,8 @@
       if (!window.ws.socket.OPEN) return;
       const data = JSON.parse(e.data);
 
-      if (data.type === "ping") window.ws.ping = data.ping;
+      if (data.type === "pong") window.ws.ping = data.ping;
+      if (data.type === "ping") window.ws.socket.send(JSON.stringify({ type: "pong" }));
 
       clearTimeout(window.ws.timeout);
       window.ws.alive = true;

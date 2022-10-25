@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const { getInfo } = require("../wrapper");
-const { getWsClients } = require("../utils");
+const { getWsClients, getWsClient } = require("../utils");
 
 router.get("/info", async (req, res) => {
   const url = req.query.url;
@@ -17,9 +17,19 @@ router.get("/info", async (req, res) => {
 router.ws("/ws", async (ws, req) => {
   const socketId = req.cookies["YTDL_SESSION_ID"];
 
-  if (getWsClients().some((value) => value.id === socketId)) return ws.terminate();
+  getWsClients().forEach((client) => {
+    if (client.id === socketId) client.terminate();
+  });
 
   ws.id = socketId;
+
+  setInterval(() => {
+    ws.timeout = setTimeout(() => {
+      ws.alive = false;
+      ws.terminate();
+    }, 4500);
+    ws.send(JSON.stringify({ type: "ping" }));
+  }, 5000);
 
   ws.on("message", (data) => {
     try {
@@ -27,13 +37,19 @@ router.ws("/ws", async (ws, req) => {
 
       switch (json.type) {
         case "ping": {
+          ws.alive = true;
           ws.send(
             JSON.stringify({
-              type: "ping",
+              type: "pong",
               ping: Date.now() - json.start,
             })
           );
+          break;
         }
+        case "pong":
+          clearTimeout(ws.timeout);
+          ws.alive = true;
+          break;
         default:
       }
     } catch (err) {

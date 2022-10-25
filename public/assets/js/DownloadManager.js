@@ -77,12 +77,12 @@ class DownloadManager {
       clearTimeout(state.infoDebounce);
       state.infoDebounce = null;
     }
+    if (this.state.data != null) this.populateDownloadInfo(); // Primer;
     state.infoDebounce = setTimeout(async () => {
-      if (!data.validURL) {
-        this.state.data = null;
-      } else {
-        this.state.data = await this.getInfo(state.url, true);
-      }
+      this.state.data = null;
+
+      if (data.validURL) this.state.data = await this.getInfo(state.url, true);
+
       this.render();
     }, debounceTime);
   }
@@ -171,20 +171,6 @@ class DownloadManager {
 
           this.createOrUpdateDownloadsListItem(downloadId, "cancel");
         });
-
-        downloadsList.children.length > 0 ? downloadsList.insertBefore(downloadItem, downloadsList.children[0]) : downloadsList.appendChild(downloadItem);
-
-        for (let i = 0; i < downloadsItems.length; i++) {
-          const item = downloadsItems[i];
-          if (item.dataset.id === downloadId) {
-            this.downloadsMap[downloadId] = {
-              cancelled: false,
-              element: item,
-            };
-
-            break;
-          }
-        }
         break;
       case "begin":
         downloadItem.querySelector(".downloads__name").innerText = data.title;
@@ -240,6 +226,22 @@ class DownloadManager {
 
       default:
         break;
+    }
+
+    if (this.downloadsMap[downloadId] == null) {
+      downloadsList.children.length > 0 ? downloadsList.insertBefore(downloadItem, downloadsList.children[0]) : downloadsList.appendChild(downloadItem);
+
+      for (let i = 0; i < downloadsItems.length; i++) {
+        const item = downloadsItems[i];
+        if (item.dataset.id === downloadId) {
+          this.downloadsMap[downloadId] = {
+            cancelled: false,
+            element: item,
+          };
+
+          break;
+        }
+      }
     }
 
     if (downloadsItems.length === 0) {

@@ -8,7 +8,7 @@ const shared = require("../public/shared/shared");
 
 const sysInfo = {
   cpu: os.cpus()[0].model,
-  totalMem: Math.round(((Number.EPSILON + os.totalmem()) / 1000000000) * 10) / 10,
+  totalMem: Math.round(((Number.EPSILON + os.totalmem() / 1.074) / 1000000000) * 10) / 10,
   os: os.type(),
 };
 
@@ -30,8 +30,11 @@ switch (os.platform()) {
     sysInfo.gpus = "Unknown";
 }
 
-if (getGpuCmd) sysInfo.gpus = execSync(getGpuCmd, { encoding: "utf8" });
+if (getGpuCmd) sysInfo.gpus = execSync(getGpuCmd, { encoding: "utf8" }).replace(/Name/g, "").trim();
 
-router.get("/", (req, res) => res.render(path.join(__dirname, "..", "views/index"), { shared, sysInfo }));
+router.get("/", (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.render(path.join(__dirname, "..", "views/index"), { shared, sysInfo });
+});
 
 module.exports = router;
