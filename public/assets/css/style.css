@@ -479,6 +479,10 @@ select:focus {
   border: 1px solid var(--clr-primary-600);
 }
 
+select:disabled {
+  opacity: 0.45;
+}
+
 input[type="checkbox"] {
   width: 3rem;
   height: 3rem;

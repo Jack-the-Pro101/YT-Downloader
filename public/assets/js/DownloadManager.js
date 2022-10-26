@@ -63,12 +63,30 @@ class DownloadManager {
 
   render() {
     const { isCustomQuality } = this.functions;
-    const { downloadBtn } = this.elements;
+    const { downloadBtn, customVideoSelect, customAudioSelect, advancedVideoReencode, advancedAudioReencode } = this.elements;
 
     if (isCustomQuality() && !this.state.data) {
       downloadBtn.disabled = true;
     } else {
       downloadBtn.disabled = false;
+    }
+
+    const format = this.functions.getDownloadInfo().format;
+    if (format === FORMATS.AUDIO) {
+      customVideoSelect.disabled = true;
+      advancedVideoReencode.disabled = true;
+      customAudioSelect.disabled = false;
+      advancedAudioReencode.disabled = false;
+    } else if (format === FORMATS.VIDEO) {
+      customVideoSelect.disabled = false;
+      advancedVideoReencode.disabled = false;
+      customAudioSelect.disabled = true;
+      advancedAudioReencode.disabled = true;
+    } else {
+      customVideoSelect.disabled = false;
+      advancedVideoReencode.disabled = false;
+      customAudioSelect.disabled = false;
+      advancedAudioReencode.disabled = false;
     }
   }
 

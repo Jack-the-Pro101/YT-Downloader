@@ -54,6 +54,8 @@ const downloadManager = new DownloadManager(
     downloadsItems,
     customVideoSelect,
     customAudioSelect,
+    advancedVideoReencode,
+    advancedAudioReencode,
     advancedOptionsTrimStart,
     advancedOptionsTrimEnd,
   },
@@ -97,7 +99,7 @@ const downloadManager = new DownloadManager(
         encoding: {},
       };
 
-      if (advancedOptionsEnabled) {
+      if (advancedOptionsEnabled && downloadManager.state.data) {
         if (downloadManager.state.data.duration !== advancedOptionsTrimEnd.valueAsNumber || advancedOptionsTrimStart.valueAsNumber !== 0) {
           advancedOptions.trim.start = advancedOptionsTrimStart.valueAsNumber;
           advancedOptions.trim.end = advancedOptionsTrimEnd.valueAsNumber;
@@ -156,6 +158,8 @@ function handleFormatChange(e) {
       containerSelect.appendChild(elem);
     }
   }
+
+  downloadManager.render();
 }
 
 function updateWsStatus() {
