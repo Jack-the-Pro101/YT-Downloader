@@ -639,11 +639,11 @@ input[type="checkbox"] {
   flex-direction: column;
 }
 
-.advanced__option-custom-codec {
+.advanced__option-reencoder label {
   margin-top: 1em;
 }
 
-.advanced__option-custom-codec #custom-codec-check {
+.advanced__option-custom-codec {
   margin-top: 1em;
 }
 
@@ -652,6 +652,7 @@ input[type="checkbox"] {
   padding: 0.25em;
   font-size: 2rem;
   border: 1px solid var(--clr-primary-400);
+  color: var(--clr-neutral-900);
 }
 
 .advanced__option-custom-codec input:disabled {
