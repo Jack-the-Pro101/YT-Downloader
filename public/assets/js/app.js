@@ -35,6 +35,9 @@ const advancedOptionsTrimStart = document.querySelector("#trim1");
 const advancedOptionsTrimEnd = document.querySelector("#trim2");
 const advancedVideoReencode = document.querySelector("#video-reencode");
 const advancedAudioReencode = document.querySelector("#audio-reencode");
+const advancedCustomCodec = document.querySelector("#custom-codec-check");
+const advancedCustomVideoReencode = document.querySelector("#custom-codec-video");
+const advancedCustomAudioReencode = document.querySelector("#custom-codec-audio");
 
 const downloadsList = document.querySelector(".downloads__list");
 const downloadsCollapseBtn = document.querySelector(".downloads__header");
@@ -104,11 +107,20 @@ const downloadManager = new DownloadManager(
           advancedOptions.trim.start = advancedOptionsTrimStart.valueAsNumber;
           advancedOptions.trim.end = advancedOptionsTrimEnd.valueAsNumber;
         }
-        if (advancedVideoReencode.value !== "copy") {
-          advancedOptions.encoding.video = advancedVideoReencode.value;
-        }
-        if (advancedAudioReencode.value !== "copy") {
-          advancedOptions.encoding.audio = advancedAudioReencode.value;
+        if (advancedCustomCodec.checked) {
+          if (advancedCustomVideoReencode) {
+            advancedOptions.encoding.video = advancedCustomVideoReencode.value;
+          }
+          if (advancedCustomAudioReencode) {
+            advancedOptions.encoding.audio = advancedCustomAudioReencode.value;
+          }
+        } else {
+          if (advancedVideoReencode.value !== "copy") {
+            advancedOptions.encoding.video = advancedVideoReencode.value;
+          }
+          if (advancedAudioReencode.value !== "copy") {
+            advancedOptions.encoding.audio = advancedAudioReencode.value;
+          }
         }
       }
 
@@ -231,6 +243,20 @@ customAudioViewSrcBtn.addEventListener("click", (e) => {
 
   const url = customAudioSelect.options[customAudioSelect.selectedIndex].dataset.source;
   if (url) window.open(url, "_blank");
+});
+
+advancedCustomCodec.addEventListener("input", () => {
+  if (advancedCustomCodec.checked) {
+    advancedCustomVideoReencode.disabled = false;
+    advancedCustomAudioReencode.disabled = false;
+    advancedVideoReencode.disabled = true;
+    advancedAudioReencode.disabled = true;
+  } else {
+    advancedCustomVideoReencode.disabled = true;
+    advancedCustomAudioReencode.disabled = true;
+    advancedVideoReencode.disabled = false;
+    advancedAudioReencode.disabled = false;
+  }
 });
 
 advancedOptionsTrimStart.addEventListener("input", () => {

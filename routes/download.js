@@ -36,7 +36,7 @@ router.get("/", (req, res) => {
   res.once("close", () => {
     if (!status.done) {
       const killed = downloader.cancel();
-      console.log(killed);
+      console.log("Cancelled download operation");
     }
     if (info.advancedOptionsEnabled && !status.postProccessDone && status.worker != null) {
       status.processingCancelled = true;
@@ -52,7 +52,7 @@ router.get("/", (req, res) => {
         }
       });
 
-      console.log(killed);
+      console.log("Cancelled download operation");
     }
   });
 
@@ -155,12 +155,14 @@ router.get("/", (req, res) => {
         worker.stdout.setEncoding("utf8");
         worker.stderr.setEncoding("utf8");
 
-        worker.stdout.on("data", (data) => {
-          console.log(data.toString());
-        });
-        worker.stderr.on("data", (data) => {
-          console.log(data.toString());
-        });
+        if (process.env.NODE_ENV !== "production") {
+          worker.stdout.on("data", (data) => {
+            console.log(data.toString());
+          });
+          worker.stderr.on("data", (data) => {
+            console.log(data.toString());
+          });
+        }
 
         worker.on("close", (code) => {
           if (code === 0) {
@@ -182,7 +184,7 @@ router.get("/", (req, res) => {
 
     if (status.processingCancelled) return res.sendStatus(500);
 
-    res.header("Filename", dest.slice(0, dest.length - (36 + 1 + path.extname(dest).length) + (info.advancedOptionsEnabled ? " [processed]".length : 0))) +
+    res.header("Filename", dest.slice(0, dest.length - (36 + 1 + path.extname(dest).length + (info.advancedOptionsEnabled ? " [processed]".length : 0)))) +
       path.extname(dest); // 36 is UUID length, + 1 is length of extra hyphen
     res.header("Id", id);
     res.sendFile(dest, { root: absPath }, (err) => {

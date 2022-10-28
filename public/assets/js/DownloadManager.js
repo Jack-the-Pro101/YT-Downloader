@@ -154,7 +154,17 @@ class DownloadManager {
   }
 
   async getInfo(url, populate) {
+    const { downloadBtn } = this.elements;
+
+    const timeoutAddLoading = setTimeout(() => {
+      downloadBtn.classList.add("loading");
+    }, 100);
+
     const request = await fetch("api/info?url=" + url);
+
+    clearTimeout(timeoutAddLoading);
+    downloadBtn.classList.remove("loading");
+
     if (!request.ok) return false;
 
     try {
@@ -169,7 +179,8 @@ class DownloadManager {
   createOrUpdateDownloadsListItem(downloadId, state, data) {
     const { downloadsTemplate, downloadsList, downloadsItems } = this.elements;
 
-    const downloadItem = this.downloadsMap[downloadId] == null ? downloadsTemplate.content.cloneNode(true) : this.downloadsMap[downloadId].element;
+    const downloadItemExists = this.downloadsMap[downloadId] == null;
+    const downloadItem = downloadItemExists ? downloadsTemplate.content.cloneNode(true) : this.downloadsMap[downloadId].element;
 
     switch (state) {
       case "init":
@@ -246,7 +257,7 @@ class DownloadManager {
         break;
     }
 
-    if (this.downloadsMap[downloadId] == null) {
+    if (downloadItemExists) {
       downloadsList.children.length > 0 ? downloadsList.insertBefore(downloadItem, downloadsList.children[0]) : downloadsList.appendChild(downloadItem);
 
       for (let i = 0; i < downloadsItems.length; i++) {

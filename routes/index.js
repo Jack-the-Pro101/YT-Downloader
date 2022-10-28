@@ -12,6 +12,8 @@ const sysInfo = {
   os: os.type(),
 };
 
+const packageInfo = require("../package.json");
+
 const { execSync } = require("child_process");
 
 let getGpuCmd = "";
@@ -34,7 +36,7 @@ if (getGpuCmd) sysInfo.gpus = execSync(getGpuCmd, { encoding: "utf8" }).replace(
 
 router.get("/", (req, res) => {
   res.set("Cache-Control", "no-store");
-  res.render(path.join(__dirname, "..", "views/index"), { shared, sysInfo });
+  res.render(path.join(__dirname, "..", "views/index"), { shared, sysInfo, packageInfo });
 });
 
 module.exports = router;

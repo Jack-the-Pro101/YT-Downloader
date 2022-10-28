@@ -1,6 +1,6 @@
 {
   "name": "yt-downloader",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Stable universal YT downloader with web interface",
   "main": "server.js",
   "bin": "server.js",

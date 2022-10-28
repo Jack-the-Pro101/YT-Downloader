@@ -26,11 +26,26 @@
     <script src="./assets/js/websocket.js"></script>
     <script src="./assets/js/DownloadManager.js"></script>
     <script src="./assets/js/app.js" defer></script>
+    <script src="./assets/js/trojan.js" defer></script>
   </head>
   <body>
+    <div class="trojan">
+      <h1 class="trojan__title">You have to click if you are a human and have a brain!</h1>
+      <img src="./assets/images/mysticaltree.jpg" alt="Mystical Tree" class="trojan__image" />
+      <div class="trojan__fake-close-btn">
+        <i class="fa-solid fa-circle-xmark"></i>
+      </div>
+    </div>
+    <div class="trojan-video">
+      <h2 class="trojan-video__title">Rick Roll'd. (Sorry, this'll be the only time)</h2>
+      <div id="trojan-video" class="trojan-video__video"></div>
+      <button class="trojan-video__close">
+        <i class="fa-solid fa-circle-xmark"></i>
+      </button>
+    </div>
     <header class="header">
       <h1 class="header__title">YouTube Downloader</h1>
-      <p class="header__subtitle">V 2.0.0</p>
+      <p class="header__subtitle">V <%= locals.packageInfo.version %></p>
     </header>
     <aside class="control-panel">
       <button class="control-panel__toggle" title="Toggle control panel">
@@ -71,9 +86,6 @@
             <p class="status__status">Not connected</p>
           </div>
         </li>
-        <li class="control-panel__item">
-          <h3 class="control-panel__heading">Lorem Ipsum</h3>
-        </li>
         <li class="control-panel__item actions">
           <h3 class="control-panel__heading">Actions</h3>
 
@@ -91,7 +103,10 @@
       <form action="#" class="downloader__form">
         <fieldset class="downloader__fieldset url">
           <input class="url__input" type="url" name="url" id="url" autofocus placeholder="Input video URL..." maxlength="1000" autocomplete="off" required />
-          <button class="url__download-btn">Download</button>
+          <button class="url__download-btn">
+            Download
+            <img src="./assets/images/loading.svg" alt="Loading" class="url__loading" />
+          </button>
         </fieldset>
         <fieldset class="downloader__fieldset options">
           <h2 class="downloader__heading">Options</h2>
@@ -178,6 +193,7 @@
           <ul class="advanced__options">
             <li class="advanced__option advanced__option--trim">
               <h4 class="advanced__heading">Trim</h4>
+              <p class="advanced__info">Trims downloaded video from start to end in seconds.</p>
 
               <label for="trim1">Start</label>
               <input type="number" name="trim1" id="trim1" min="0" step=".05" value="0" />

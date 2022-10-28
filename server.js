@@ -98,6 +98,8 @@ const { spawn } = require("child_process");
 
       if (!process.env.DEV) {
         console.log("Launching client...");
+        console.log(chalk.redBright("THIS WINDOW RUNS THE DOWNLOADER! MAKE SURE TO NOT CLOSE IT!"));
+
         open("http://localhost:710");
       }
     });
@@ -110,6 +112,7 @@ const { spawn } = require("child_process");
 
     if (!process.env.DEV) {
       console.log("Launching client...");
+      console.log(chalk.redBright("THIS WINDOW RUNS THE DOWNLOADER! MAKE SURE TO NOT CLOSE IT!"));
       open("http://localhost:" + server.address().port);
     }
   });

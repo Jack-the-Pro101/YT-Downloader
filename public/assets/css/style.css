@@ -119,6 +119,85 @@ body {
   }
 }
 
+.trojan {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  max-width: 300px;
+  padding: 1em;
+  background-color: var(--clr-neutral-200);
+  box-shadow: 0 0 64px 12px rgba(0, 0, 0, 0.75);
+  display: none;
+  cursor: pointer;
+}
+
+.trojan-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+}
+
+.trojan-video__title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5em;
+  text-align: center;
+}
+
+.trojan.shown {
+  display: block;
+}
+
+.trojan-video.shown {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.trojan-video__close {
+  font-size: 6rem;
+  color: var(--clr-neutral-900);
+  background-color: transparent;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 999;
+  margin: 0.25em;
+  opacity: 0;
+  transition: opacity 2s 3s ease;
+  cursor: pointer;
+}
+
+.shown .trojan-video__close {
+  opacity: 1;
+}
+
+.trojan__title {
+  font-size: 2.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5em;
+}
+
+.trojan__image {
+  width: 100%;
+  display: block;
+}
+
+.trojan__fake-close-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  color: var(--clr-neutral-800);
+}
+
 .header {
   display: flex;
   flex-direction: column;
@@ -339,6 +418,8 @@ body {
   background-size: 200%;
   background-repeat: no-repeat;
   border-radius: 100vmax;
+  display: flex;
+  align-items: center;
   margin: -1px;
   border: none;
   transition: background-position 0.5s ease-out;
@@ -352,6 +433,17 @@ body {
 .url__download-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.url__loading {
+  max-height: 1.75em;
+  width: auto;
+  margin-left: 0.5em;
+  display: none;
+}
+
+.loading .url__loading {
+  display: block;
 }
 
 .options__option-list {
