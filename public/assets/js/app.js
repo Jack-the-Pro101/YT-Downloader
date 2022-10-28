@@ -59,6 +59,8 @@ const downloadManager = new DownloadManager(
     customAudioSelect,
     advancedVideoReencode,
     advancedAudioReencode,
+    advancedCustomVideoReencode,
+    advancedCustomAudioReencode,
     advancedOptionsTrimStart,
     advancedOptionsTrimEnd,
   },

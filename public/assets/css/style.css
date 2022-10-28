@@ -170,6 +170,7 @@ body {
   right: 0;
   z-index: 999;
   margin: 0.25em;
+  border: none;
   opacity: 0;
   transition: opacity 2s 3s ease;
   cursor: pointer;
@@ -636,6 +637,25 @@ input[type="checkbox"] {
 .advanced__option-reencoder {
   display: flex;
   flex-direction: column;
+}
+
+.advanced__option-custom-codec {
+  margin-top: 1em;
+}
+
+.advanced__option-custom-codec #custom-codec-check {
+  margin-top: 1em;
+}
+
+.advanced__option-custom-codec input {
+  background-color: transparent;
+  padding: 0.25em;
+  font-size: 2rem;
+  border: 1px solid var(--clr-primary-400);
+}
+
+.advanced__option-custom-codec input:disabled {
+  opacity: 0.4;
 }
 
 .advanced__option-container {
