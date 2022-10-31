@@ -62,7 +62,15 @@ const path = require("path");
   });
 
   if (process.env.NODE_ENV === "production" && fs.existsSync(path.join(process.cwd(), "./tmp"))) {
-    fs.rmdirSync(path.join(process.cwd(), "./tmp"));
+    console.log("Cleaning temp folder...");
+    fs.rmSync(path.join(process.cwd(), "./tmp"), { recursive: true, force: true }, (err) => {
+      if (err) {
+        console.error(err);
+        console.log("Failed to clean temp folder. Manual action required. Continuing with start...");
+      } else {
+        console.log("Cleaned temp folder.");
+      }
+    });
   }
 
   function serverStarted(url) {

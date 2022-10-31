@@ -34,9 +34,11 @@ router.get("/", (req, res) => {
   };
 
   res.once("close", () => {
-    if (!status.done) {
+    if (!status.downloadDone) {
       const killed = downloader.cancel();
       console.log("Cancelled download operation");
+    } else {
+      console.log("Finished download operation");
     }
     if (info.advancedOptionsEnabled && !status.postProccessDone && status.worker != null) {
       status.processingCancelled = true;
@@ -52,7 +54,7 @@ router.get("/", (req, res) => {
         }
       });
 
-      console.log("Cancelled download operation");
+      console.log("Cancelled post process operation");
     }
   });
 
@@ -120,7 +122,7 @@ router.get("/", (req, res) => {
   });
 
   downloader.emitter.once("finish", async (dest, id) => {
-    done = true;
+    status.downloadDone = true;
 
     const absPath = path.join(process.cwd(), "./tmp");
     const absFilePath = path.join(absPath, dest);
@@ -149,7 +151,7 @@ router.get("/", (req, res) => {
         if (info.format === FORMATS.VIDEO || info.format === FORMATS.VIDEOAUDIO) args.push("-c:v", info.advancedOptions.encoding.video ?? "copy");
         if (info.format === FORMATS.AUDIO || info.format === FORMATS.VIDEOAUDIO) args.push("-c:a", info.advancedOptions.encoding.audio ?? "copy");
 
-        const worker = spawn(ffmpegPath, ["-i", absFilePath, "-y", ...args, processedFile], {
+        const worker = spawn(path.join(ffmpegPath, "ffmpeg.exe"), ["-i", absFilePath, "-y", ...args, processedFile], {
           cwd: absPath,
         });
         worker.stdout.setEncoding("utf8");
@@ -166,7 +168,7 @@ router.get("/", (req, res) => {
 
         worker.on("close", (code) => {
           if (code === 0) {
-            postProccessDone = true;
+            status.postProccessDone = true;
             resolve(processedFile);
           } else {
             reject(code);
