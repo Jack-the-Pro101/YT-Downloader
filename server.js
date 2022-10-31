@@ -1,7 +1,6 @@
 if (process.env.NODE_ENV !== "production") require("dotenv").config();
 
 const express = require("express");
-const ejs = require("ejs");
 const open = require("open");
 const cookieParser = require("cookie-parser");
 const { v4: uuid } = require("uuid");
@@ -10,8 +9,6 @@ const chalk = require("chalk");
 
 const fs = require("fs");
 const path = require("path");
-
-const { spawn } = require("child_process");
 
 (async function () {
   console.time("Start");
@@ -64,56 +61,36 @@ const { spawn } = require("child_process");
     }
   });
 
-  // Handled by wrapper
+  if (process.env.NODE_ENV === "production" && fs.existsSync(path.join(process.cwd(), "./tmp"))) {
+    fs.rmdirSync(path.join(process.cwd(), "./tmp"));
+  }
 
-  // if (process.env.DEV !== "true") {
-  //   console.log(chalk.green("Checking for downloader updates..."));
-  //   const updater = spawn("./downloader/yt-dlp.exe", ["-U"]);
-
-  //   await new Promise((resolve, reject) => {
-  //     updater.stdout.on("data", (data) => {
-  //       const text = data.toString("utf-8");
-
-  //       if (text.includes("is up to date")) {
-  //         console.log(text);
-  //         return resolve();
-  //       } else if (text.includes("Updating")) {
-  //         console.log(text);
-  //         return resolve();
-  //       }
-
-  //       setTimeout(() => {
-  //         reject();
-  //       }, 20000);
-  //     });
-  //   });
-  // } else {
-  //   console.log(chalk.green("Development environment enabled, skipping version check for start up time..."));
-  // }
-
-  try {
-    app.listen(710, () => {
-      console.log(chalk.greenBright("Server online"));
-      console.timeEnd("Start");
-
-      if (!process.env.DEV) {
-        console.log("Launching client...");
-        console.log(chalk.redBright("THIS WINDOW RUNS THE DOWNLOADER! MAKE SURE TO NOT CLOSE IT!"));
-
-        open("http://localhost:710");
-      }
-    });
-
-    return;
-  } catch (err) {}
-  const server = app.listen(0, () => {
-    console.log(chalk.greenBright("Server online"));
-    console.timeEnd("Start");
+  function serverStarted(url) {
+    console.log(chalk.greenBright("Server online at " + url));
 
     if (!process.env.DEV) {
-      console.log("Launching client...");
-      console.log(chalk.redBright("THIS WINDOW RUNS THE DOWNLOADER! MAKE SURE TO NOT CLOSE IT!"));
-      open("http://localhost:" + server.address().port);
+      console.log(`Launching client...`);
+      console.log(chalk.redBright("\nTHIS WINDOW RUNS THE DOWNLOADER! MAKE SURE TO NOT CLOSE IT!"));
+
+      open(url);
+    }
+  }
+
+  let server = app.listen(710);
+
+  server.once("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.log(chalk.yellowBright("Port 710 in use! Assigning random port..."));
+      server = app.listen(0);
+    } else {
+      console.error(err);
+      process.exit(1);
     }
   });
+
+  server.once("listening", () => {
+    serverStarted("http://localhost:" + server.address().port);
+  });
+
+  console.timeEnd("Start");
 })();

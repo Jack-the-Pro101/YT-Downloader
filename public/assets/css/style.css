@@ -647,6 +647,16 @@ input[type="checkbox"] {
   margin-top: 1em;
 }
 
+.advanced__option-custom-codec-enabler {
+  display: flex;
+  align-items: center;
+  margin: 1.5em 0 0.75em 0;
+}
+
+.advanced__option-custom-codec-enabler label {
+  margin-top: 0;
+}
+
 .advanced__option-custom-codec input {
   background-color: transparent;
   padding: 0.25em;
