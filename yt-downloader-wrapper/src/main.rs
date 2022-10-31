@@ -38,6 +38,7 @@ fn main() {
         let yt_dlp_update = Command::new(ytdlp_path)
             .args(&["-U"])
             .current_dir(temp_dir)
+            .stdout(Stdio::null())
             .spawn();
         if yt_dlp_update.is_err() {
             println!("Error: {}", yt_dlp_update.err().unwrap());
@@ -82,6 +83,7 @@ fn start_node(temp_dir: &str) -> Result<i32, i32> {
     let mut node_child = Command::new("ytd-node")
         .env("BINARY_PATH", temp_dir)
         .env("NODE_ENV", "production")
+        .env("FORCE_COLOR", "true")
         .stdin(Stdio::inherit())
         .stdout(Stdio::piped())
         .spawn()
