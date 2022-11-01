@@ -309,3 +309,5 @@ controlPanelActionsList.querySelector("[data-power]").addEventListener("click", 
     alert(`Failure to power off, status ${req.status}:\n${req.statusText}`);
   }
 });
+
+downloadManager.render();

@@ -186,8 +186,10 @@ router.get("/", (req, res) => {
 
     if (status.processingCancelled) return res.sendStatus(500);
 
-    res.header("Filename", dest.slice(0, dest.length - (36 + 1 + path.extname(dest).length + (info.advancedOptionsEnabled ? " [processed]".length : 0)))) +
-      path.extname(dest); // 36 is UUID length, + 1 is length of extra hyphen
+    res.header(
+      "Filename",
+      dest.slice(0, dest.length - (36 + 1 + path.extname(dest).length + (info.advancedOptionsEnabled ? " [processed]".length : 0))) + path.extname(dest)
+    ); // 36 is UUID length, + 1 is length of extra hyphen
     res.header("Id", id);
     res.sendFile(dest, { root: absPath }, (err) => {
       if (err) {
