@@ -10,4 +10,4 @@ Primary developer: Emperor of Bluegaria (a.k.a. Jack H.)
 Wrapper developer: [@infiniwave](https://github.com/infiniwave)
 
 Big thanks to [yt-dlp](https://github.com/yt-dlp/yt-dlp)
-_MAKE AN ACTUAL DOCUMENATION INSTEAD OF ONE GIANT README PLEASE!_
+_MAKE AN ACTUAL DOCUMENTATION INSTEAD OF ONE GIANT README PLEASE!_

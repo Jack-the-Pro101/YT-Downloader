@@ -105,7 +105,7 @@ class DownloadManager {
     }, debounceTime);
   }
 
-  populateDownloadInfo(data) {
+  populateDownloadInfo(data, videoId) {
     const { customVideoSelect, customAudioSelect, advancedOptionsTrimStart, advancedOptionsTrimEnd } = this.elements;
 
     customVideoSelect.innerHTML = "";
@@ -151,6 +151,10 @@ class DownloadManager {
       });
     } else {
     }
+
+    Object.keys(this.downloadsMap).forEach((key) => {
+      if (this.downloadsMap[key].videoId === videoId) this.createOrUpdateDownloadsListItem(key, "begin", { type: "begin", id: key, title: data.title });
+    });
   }
 
   async getInfo(url, populate) {
@@ -169,7 +173,7 @@ class DownloadManager {
 
     try {
       const data = await request.json();
-      if (populate) this.populateDownloadInfo(data);
+      if (populate) this.populateDownloadInfo(data, getVideoID(url));
       return data;
     } catch {
       return false;
@@ -179,8 +183,8 @@ class DownloadManager {
   createOrUpdateDownloadsListItem(downloadId, state, data) {
     const { downloadsTemplate, downloadsList, downloadsItems } = this.elements;
 
-    const downloadItemExists = this.downloadsMap[downloadId] == null;
-    const downloadItem = downloadItemExists ? downloadsTemplate.content.cloneNode(true) : this.downloadsMap[downloadId].element;
+    const downloadItemNotExists = this.downloadsMap[downloadId] == null;
+    const downloadItem = downloadItemNotExists ? downloadsTemplate.content.cloneNode(true) : this.downloadsMap[downloadId].element;
 
     switch (state) {
       case "init":
@@ -210,7 +214,6 @@ class DownloadManager {
         downloadItem.querySelector(".downloads__progress-text").innerText = data.progress.percent;
 
         break;
-
       case "beginPost":
         downloadItem.querySelector(".downloads__progress-text").innerText = "Processing...";
 
@@ -235,7 +238,6 @@ class DownloadManager {
           this.createOrUpdateDownloadsListItem(downloadId, "delete");
         }, 7500);
         break;
-
       case "finish":
         const { filename, downloadURL } = data;
 
@@ -247,17 +249,16 @@ class DownloadManager {
         downloadItem.classList.remove("downloading");
 
         break;
-
       case "delete":
         delete this.downloadsMap[downloadId];
         downloadItem.remove();
         break;
 
       default:
-        break;
+        console.error(`Unknown list operation '${state}'`);
     }
 
-    if (downloadItemExists) {
+    if (downloadItemNotExists) {
       downloadsList.children.length > 0 ? downloadsList.insertBefore(downloadItem, downloadsList.children[0]) : downloadsList.appendChild(downloadItem);
 
       for (let i = 0; i < downloadsItems.length; i++) {
@@ -265,6 +266,7 @@ class DownloadManager {
         if (item.dataset.id === downloadId) {
           this.downloadsMap[downloadId] = {
             cancelled: false,
+            videoId: data.videoId,
             element: item,
           };
 
@@ -297,12 +299,12 @@ class DownloadManager {
 
     const abortController = new AbortController();
 
-    this.createOrUpdateDownloadsListItem(downloadId, "init", { abortController });
+    this.createOrUpdateDownloadsListItem(downloadId, "init", { abortController, videoId: getVideoID(this.state.url) });
 
     const download = await fetch("download?" + urlParams.toString(), {
       method: "GET",
       signal: abortController.signal,
-    }).catch((rej) => {}); // Aborted, expected behaviour
+    }).catch((rej) => {}); // Aborted, expected behavior
 
     if ((!this.downloadsMap[downloadId].cancelled && download == null) || (download != null && !download.ok)) {
       this.createOrUpdateDownloadsListItem(downloadId, "fail");

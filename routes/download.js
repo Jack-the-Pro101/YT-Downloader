@@ -151,9 +151,13 @@ router.get("/", (req, res) => {
         if (info.format === FORMATS.VIDEO || info.format === FORMATS.VIDEOAUDIO) args.push("-c:v", info.advancedOptions.encoding.video ?? "copy");
         if (info.format === FORMATS.AUDIO || info.format === FORMATS.VIDEOAUDIO) args.push("-c:a", info.advancedOptions.encoding.audio ?? "copy");
 
-        const worker = spawn(path.join(ffmpegPath, "ffmpeg.exe"), ["-i", absFilePath, "-y", ...args, processedFile], {
-          cwd: absPath,
-        });
+        const worker = spawn(
+          process.env.NODE_ENV === "production" ? path.join(ffmpegPath, "ffmpeg.exe") : ffmpegPath,
+          ["-i", absFilePath, "-y", ...args, processedFile],
+          {
+            cwd: absPath,
+          }
+        );
         worker.stdout.setEncoding("utf8");
         worker.stderr.setEncoding("utf8");
 

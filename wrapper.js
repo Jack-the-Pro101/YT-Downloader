@@ -1,4 +1,4 @@
-const { validateURL, getURLVideoID } = require("./public/shared/shared");
+const { validateURL, getVideoID } = require("./public/shared/shared");
 
 const { spawn, spawnSync } = require("child_process");
 
@@ -15,13 +15,13 @@ const VideosCacheStore = require("./classes/VideosCacheStore");
 const sharedConstants = require("./public/shared/shared");
 
 const interactSync = (url, args = []) => {
-  return spawnSync(ytDlpPath(), [...args, url], {
+  return spawnSync(ytDlpPath, [...args, url], {
     encoding: "utf8",
   });
 };
 
 const interact = (url, downloadId, args = []) => {
-  const child = spawn(ytDlpPath(), [
+  const child = spawn(ytDlpPath, [
     ...args,
     "--output",
     path.join(process.cwd(), "/tmp/") + "%(title)s" + `-${downloadId}` + ".%(ext)s",
@@ -36,15 +36,15 @@ const interact = (url, downloadId, args = []) => {
   return child;
 };
 
-exports.getInfo = async (url) => {
-  if (!validateURL(url)) return false;
+exports.getInfo = async (urlOrId) => {
+  if (!validateURL(urlOrId)) return false;
 
-  const videoId = getURLVideoID(url);
+  const videoId = getVideoID(urlOrId);
 
   const cache = VideosCacheStore.get(videoId);
   if (cache) return cache;
 
-  const process = interactSync(url, ["--dump-json"]);
+  const process = interactSync(urlOrId, ["--dump-json"]);
 
   const output = process.stdout;
 
@@ -84,6 +84,7 @@ exports.download = (url, info, downloadId) => {
   const args = [
     "--exec",
     "echo =%(filepath)s",
+    "--progress",
     "--print",
     "before_dl:<%(title)s",
     "--print",

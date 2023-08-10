@@ -1,11 +1,5 @@
 const path = require("path");
-const ytDlpPath = () => {
-  if (process.env.NODE_ENV === "production") {
-    return path.join(process.env.BINARY_PATH, "yt-dlp.exe");
-  } else {
-    return path.join(__dirname, "./downloader/yt-dlp.exe");
-  }
-};
+const ytDlpPath = process.env.NODE_ENV === "production" ? path.join(process.env.BINARY_PATH, "yt-dlp.exe") : path.join(__dirname, "./downloader/yt-dlp.exe");
 
 const ffmpegStatic = require("ffmpeg-static");
 

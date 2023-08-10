@@ -1,6 +1,6 @@
 {
   "name": "yt-downloader",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Stable universal YT downloader with web interface",
   "main": "server.js",
   "bin": "server.js",
@@ -20,7 +20,9 @@
     "dev": "nodemon . --ignore public",
     "start": "node .",
     "build": "pkg .",
-    "buildwin": "pkg . --target node18-win-x64"
+    "buildWin": "pkg . --target node18-win-x64",
+    "buildLinux": "pkg . --target node18-linux-x64",
+    "buildMac": "pkg . --target node18-macos-x64"
   },
   "keywords": [
     "yt",

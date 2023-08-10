@@ -262,6 +262,8 @@ advancedCustomCodec.addEventListener("input", () => {
 });
 
 advancedOptionsTrimStart.addEventListener("input", () => {
+  advancedOptionsTrimStart.value = advancedOptionsTrimStart.value.replace(/^0+/, "");
+
   if (!advancedOptionsTrimStart.value) {
     advancedOptionsTrimStart.value = 0;
   }
@@ -270,12 +272,14 @@ advancedOptionsTrimStart.addEventListener("input", () => {
   if (time === 0) {
     advancedOptionsTrimStart.min = 0;
     advancedOptionsTrimEnd.max = downloadManager.state.data ? downloadManager.state.data.duration : 0;
-  } else {
-    advancedOptionsTrimEnd.min = time;
   }
+
+  advancedOptionsTrimEnd.min = time;
 });
 
 advancedOptionsTrimEnd.addEventListener("input", () => {
+  advancedOptionsTrimEnd.value = advancedOptionsTrimEnd.value.replace(/^0+/, "");
+
   if (!advancedOptionsTrimEnd.value) {
     advancedOptionsTrimEnd.value = advancedOptionsTrimEnd.max;
   }
